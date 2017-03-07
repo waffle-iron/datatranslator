@@ -44,7 +44,7 @@ SELECT
     cast(COL as integer),
     cast(ROW as integer),
     to_date(DATE, 'YYYYMMDD'),
-    to_timestamp(cast((cast(HOUR as integer)/10000) as text), 'HH24'),
+    to_timestamp(LPAD(HOUR::text, 6, '0'), 'HH24MISS'),
     cast(O3 as float),
     cast(PM25_PRIMARY as float),
     cast(PM25_SECONDARY as float)
