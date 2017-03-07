@@ -31,7 +31,8 @@ create table cmaq (
     ID text,
     COL integer,
     ROW integer,
-    DATE date, HOUR time,
+    DATE date, 
+    HOUR time,
     O3 float,
     PM25_PRIMARY float,
     PM25_SECONDARY float
