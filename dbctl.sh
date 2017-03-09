@@ -8,8 +8,8 @@ _usage() {
     echo "usage: $0 start                       # Starts backend database container"
     echo "usage: $0 stop                        # Stops backend database container"
     echo "usage: $0 restart                     # restarts backend database container"
-    echo "usage: $0 prompt                      # Connects to backend database as postgres user"
-    echo "usage: $0 prompt USER PASS DATABASE   # Connects to backend DATABASE as USERNAME"
+    echo "usage: $0 dbshell                     # Connects to backend database as postgres user"
+    echo "usage: $0 dbshell USER PASS DATABASE  # Connects to backend DATABASE as USERNAME"
     echo "usage: $0 purge                       # Remove backend database and all contents"
 }
 
@@ -38,7 +38,7 @@ _restart() {
     _start
 }
 
-_prompt() {
+_dbshell() {
     if [[ $# -eq 1 ]]; then
         # connect to database as postgres user
         docker exec -ti -u postgres ${CONTAINER_ID} psql
@@ -68,7 +68,7 @@ case "$1" in
         ;;
     restart) _restart
         ;;
-    prompt) _prompt "$@"
+    dbshell) _dbshell "$@"
         ;;
     purge) _purge
         ;;
