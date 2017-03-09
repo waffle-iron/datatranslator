@@ -1,0 +1,9 @@
+backend:
+#  image: mjstealey/datatranslator:latest
+  build: backend
+  container_name: backend
+  volumes:
+  - "/var/lib/pgsql"
+  ports:
+  - "5432"
+  command: run

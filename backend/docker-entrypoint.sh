@@ -17,9 +17,13 @@ __postgresql_conf() {
 }
 
 if [[ "$1" = 'run' ]]; then
-    __postgresql95-setup
-    gosu root /usr/pgsql-9.5/bin/postgresql95-setup initdb
-    __pg_hba_conf
-    __postgresql_conf
+    if [ "$(ls -A /var/lib/pgsql/9.5/data)" ]; then
+        echo "WARNING: Data directory is not empty!"
+    else
+        __postgresql95-setup
+        gosu root /usr/pgsql-9.5/bin/postgresql95-setup initdb
+        __pg_hba_conf
+        __postgresql_conf
+    fi
     gosu postgres /usr/pgsql-9.5/bin/postgres -D /var/lib/pgsql/9.5/data -p 5432
 fi
