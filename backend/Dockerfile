@@ -35,8 +35,8 @@ RUN rpm -ivh http://yum.postgresql.org/9.5/redhat/rhel-7-x86_64/pgdg-centos95-9.
 # Shenanigans to make dockerhub happy
 COPY . /tmp
 RUN cp /tmp/docker-entrypoint.sh /docker-entrypoint.sh \
-    && cp /tmp/.pgsql_profile /var/lib/pgsql/.pgsql_profile \
-    && chown postgres:postgres /var/lib/pgsql/.pgsql_profile \
+    && cp /tmp/.pgsql_profile /.pgsql_profile \
+    && cp /tmp/.bash_profile /.bash_profile \
     && rm -rf /tmp/* \
     && yum clean all
 

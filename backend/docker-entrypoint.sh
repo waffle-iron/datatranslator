@@ -20,6 +20,10 @@ if [[ "$1" = 'run' ]]; then
     if [ "$(ls -A /var/lib/pgsql/9.5/data)" ]; then
         echo "WARNING: Data directory is not empty!"
     else
+        gosu root cp /.pgsql_profile /var/lib/pgsql/.pgsql_profile
+        gosu root chown postgres:postgres /var/lib/pgsql/.pgsql_profile
+        gosu root cp /.bash_profile /var/lib/pgsql/.bash_profile
+        gosu root chown postgres:postgres /var/lib/pgsql/.bash_profile
         __postgresql95-setup
         gosu root /usr/pgsql-9.5/bin/postgresql95-setup initdb
         __pg_hba_conf

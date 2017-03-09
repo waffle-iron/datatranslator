@@ -51,4 +51,5 @@ SELECT
 FROM tmp;
 
 drop table tmp;
+alter table cmaq owner to datatrans;
 select * from cmaq;
