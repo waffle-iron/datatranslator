@@ -8,9 +8,10 @@ _usage() {
     echo "usage: $0 start                       # Starts backend database container"
     echo "usage: $0 stop                        # Stops backend database container"
     echo "usage: $0 restart                     # restarts backend database container"
-    echo "usage: $0 dbshell                     # Connects to backend database as postgres user"
-    echo "usage: $0 dbshell USER PASS DATABASE  # Connects to backend DATABASE as USERNAME"
-    echo "usage: $0 purge                       # Remove backend database and all contents"
+    echo "usage: $0 build                       # issues docker-compose build call"
+    echo "usage: $0 psql                        # Connects to backend database as postgres user"
+    echo "usage: $0 psql USER PASS DATABASE     # Connects to backend DATABASE as USER:PASS"
+    echo "usage: $0 purge                       # Remove backend database and container"
 }
 
 _start() {
@@ -38,7 +39,11 @@ _restart() {
     _start
 }
 
-_dbshell() {
+_build() {
+    _stop
+    docker-compose build
+}
+_psql() {
     if [[ $# -eq 1 ]]; then
         # connect to database as postgres user
         docker exec -ti -u postgres ${CONTAINER_ID} psql
@@ -68,7 +73,9 @@ case "$1" in
         ;;
     restart) _restart
         ;;
-    dbshell) _dbshell "$@"
+    build) _build
+        ;;
+    psql) _psql "$@"
         ;;
     purge) _purge
         ;;
