@@ -25,8 +25,8 @@ $ ./dbctl help
 usage: ./dbctl help                        # Display this usage message
 usage: ./dbctl start                       # Starts backend database container
 usage: ./dbctl stop                        # Stops backend database container
-usage: ./dbctl restart                     # restarts backend database container
-usage: ./dbctl build                       # issues docker-compose build call
+usage: ./dbctl restart                     # Restarts backend database container
+usage: ./dbctl build                       # Issues docker-compose build call
 usage: ./dbctl psql                        # Connects to backend database as postgres user
 usage: ./dbctl psql USER PASS DATABASE     # Connects to backend DATABASE as USER:PASS
 usage: ./dbctl purge                       # Remove backend database and container
