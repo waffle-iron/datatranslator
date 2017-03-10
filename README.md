@@ -10,6 +10,9 @@ Assumes use of docker and docker-compose within a Linux environment. A VirtualBo
 - Check: **Reinitialize the MAC address of all network cards**
 - Import
 - Network settings, Shared Folders and Guest Additions updates are the responsibility of the user and will not be outlined here
+- Default user with sudo rights is:
+  - username: **docker**
+  - password: **docker**
 
 ---
 
