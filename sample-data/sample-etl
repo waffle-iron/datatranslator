@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# Sample data from CMAQ: sample_cmaq_output.csv
+
+# load sample_cmaq_output.csv and sample_cmaq_etl.sql to backend container:
+docker cp sample_cmaq_output.csv backend:/sample_cmaq_output.csv
+docker cp sample_cmaq_etl.sql backend:/sample_cmaq_etl.sql
+
+# create user: datatrans, password: somepassword, database: bdtgreen
+docker exec backend gosu postgres psql -c "CREATE USER datatrans WITH PASSWORD 'somepassword';"
+docker exec backend gosu postgres psql -c "CREATE DATABASE bdtgreen;"
+docker exec backend gosu postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE "bdtgreen" TO datatrans;'
+
+# create extension postgis, postgis_topology and ogr_fdw
+docker exec backend gosu postgres psql -c "CREATE EXTENSION postgis;"
+docker exec backend gosu postgres psql -c "CREATE EXTENSION postgis_topology;"
+docker exec backend gosu postgres psql -c "CREATE EXTENSION ogr_fdw;"
+
+# ingest sample data into cmaq table
+docker exec backend gosu postgres psql bdtgreen -f sample_cmaq_etl.sql
+
+exit 0;
