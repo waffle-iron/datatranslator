@@ -71,7 +71,7 @@ Stopping backend ...
 ```
 
 ```
-./dbctl restart
+$ ./dbctl restart
 Stopping backend ... done
 Starting backend ... done
 ```
