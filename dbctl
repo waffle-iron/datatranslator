@@ -43,6 +43,7 @@ _build() {
     _stop
     docker-compose build
 }
+
 _psql() {
     if [[ $# -eq 1 ]]; then
         # connect to database as postgres user
@@ -54,8 +55,8 @@ _psql() {
         docker exec -ti ${CONTAINER_ID} psql -h localhost -U ${2} ${4}
     else
         echo "Invalid request..."
-        echo "usage: $0 prompt                      # Connects to backend database as postgres user"
-        echo "usage: $0 prompt USER PASS DATABASE   # Connects to backend DATABASE as USERNAME"
+        echo "usage: $0 psql                        # Connects to backend database as postgres user"
+        echo "usage: $0 psql USER PASS DATABASE     # Connects to backend DATABASE as USER:PASS"
     fi
 }
 
