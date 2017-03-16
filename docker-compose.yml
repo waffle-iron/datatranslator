@@ -6,3 +6,9 @@ backend:
   ports:
   - "5432:5432"
   command: run
+pgadmin:
+  build: pgadmin4
+  container_name: pgadmin
+  ports:
+  - "5050:5050"
+  command: pgadmin

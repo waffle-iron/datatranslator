@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-CONTAINER_ID=backend
+BACKEND_ID=backend
+PGADMIN_ID=pgadmin
 
 _usage() {
     echo "--- Backend PostgreSQL Usage ---"
@@ -12,25 +13,27 @@ _usage() {
     echo "usage: $0 psql                        # Connects to backend database as postgres user"
     echo "usage: $0 psql USER PASS DATABASE     # Connects to backend DATABASE as USER:PASS"
     echo "usage: $0 purge                       # Remove backend database and container"
+    echo "usage: $0 pgadmin start               # Start the pgadmin container"
+    echo "usage: $0 pgadmin stop                # Stop the pgadmin container"
 }
 
 _start() {
     if [[ "$(docker ps -a | grep backend)" ]]; then
-        if [[ $(docker inspect -f {{.State.Running}} ${CONTAINER_ID}) != 'true' ]]; then
-            docker-compose start ${CONTAINER_ID}
+        if [[ $(docker inspect -f {{.State.Running}} ${BACKEND_ID}) != 'true' ]]; then
+            docker-compose start ${BACKEND_ID}
         else
-            echo "${CONTAINER_ID} is already running..."
+            echo "${BACKEND_ID} is already running..."
         fi
     else
-        docker-compose up -d
+        docker-compose up -d ${BACKEND_ID}
     fi
 }
 
 _stop() {
-    if [[ $(docker inspect -f {{.State.Running}} ${CONTAINER_ID}) = 'true' ]]; then
-        docker-compose stop ${CONTAINER_ID}
+    if [[ $(docker inspect -f {{.State.Running}} ${BACKEND_ID}) = 'true' ]]; then
+        docker-compose stop ${BACKEND_ID}
     else
-        echo "${CONTAINER_ID} is not running..."
+        echo "${BACKEND_ID} is not running..."
     fi
 }
 
@@ -47,12 +50,12 @@ _build() {
 _psql() {
     if [[ $# -eq 1 ]]; then
         # connect to database as postgres user
-        docker exec -ti -u postgres ${CONTAINER_ID} psql
+        docker exec -ti -u postgres ${BACKEND_ID} psql
     elif [[ $# -eq 4 ]]; then
         # hostname:port:database:username:password
-        docker exec ${CONTAINER_ID} /usr/bin/env bash -c 'install -m 0600 /dev/null /root/.pgpass'
-        docker exec ${CONTAINER_ID} /usr/bin/env bash -c 'echo "localhost:5432:'${4}':'${2}':'${3}'" >> /root/.pgpass'
-        docker exec -ti ${CONTAINER_ID} psql -h localhost -U ${2} ${4}
+        docker exec ${BACKEND_ID} /usr/bin/env bash -c 'install -m 0600 /dev/null /root/.pgpass'
+        docker exec ${BACKEND_ID} /usr/bin/env bash -c 'echo "localhost:5432:'${4}':'${2}':'${3}'" >> /root/.pgpass'
+        docker exec -ti ${BACKEND_ID} psql -h localhost -U ${2} ${4}
     else
         echo "Invalid request..."
         echo "usage: $0 psql                        # Connects to backend database as postgres user"
@@ -62,7 +65,25 @@ _psql() {
 
 _purge() {
     _stop
-    docker-compose rm -f ${CONTAINER_ID}
+    docker-compose rm -f ${BACKEND_ID}
+}
+
+_pgadmin() {
+    if [[ $# -ne 2 ]]; then
+        echo "Invalid request..."
+        echo "usage: $0 pgadmin start               # Start the pgadmin container"
+        echo "usage: $0 pgadmin stop                # Stop the pgadmin container"
+    else
+        if [ "${2,,}" = 'start' ]; then
+            docker-compose up -d ${PGADMIN_ID}
+        elif [ "${2,,}" = 'stop' ]; then
+            docker-compose stop ${PGADMIN_ID}
+        else
+            echo "Invalid request..."
+            echo "usage: $0 pgadmin start               # Start the pgadmin container"
+            echo "usage: $0 pgadmin stop                # Stop the pgadmin container"
+        fi
+    fi
 }
 
 case "$1" in
@@ -79,6 +100,8 @@ case "$1" in
     psql) _psql "$@"
         ;;
     purge) _purge
+        ;;
+    pgadmin) _pgadmin "$@"
         ;;
     *) _usage
         ;;
