@@ -25,6 +25,9 @@ _start() {
             echo "${BACKEND_ID} is already running..."
         fi
     else
+        if [[ -z "$(docker images | grep datatranslator_backend)" ]]; then
+            docker-compose build ${BACKEND_ID}
+        fi
         docker-compose up -d ${BACKEND_ID}
     fi
 }
@@ -75,6 +78,9 @@ _pgadmin() {
         echo "usage: $0 pgadmin stop                # Stop the pgadmin container"
     else
         if [ "${2,,}" = 'start' ]; then
+            if [[ -z "$(docker images | grep datatranslator_pgadmin)" ]]; then
+                docker-compose build ${PGADMIN_ID}
+            fi
             docker-compose up -d ${PGADMIN_ID}
         elif [ "${2,,}" = 'stop' ]; then
             docker-compose stop ${PGADMIN_ID}
