@@ -1,6 +1,9 @@
 # datatranslator
 Local development for datatranslator
 
+- **backend**: PostgreSQL 9.5 with PostGIS 2.2.5
+- **pgadmin**: pgAdmin 4
+
 ---
 
 Assumes use of docker and docker-compose within a Linux environment. A VirtualBox .ova example file can be found here: [docker-lubuntu-16.10.ova](http://distribution.hydroshare.org/public_html/docker-lubuntu-16.10.ova)
@@ -18,6 +21,8 @@ Assumes use of docker and docker-compose within a Linux environment. A VirtualBo
 
 ## How to use
 
+It is recommended to run `docker-compose build` prior to issuing any **dbctl** commands. This will ensure that an up to date build image is being used.
+
 ### dbctl
 
 For simplicity, a control script has been created that implements the basic functionality for the PostgreSQL / Postgis backend.
@@ -28,11 +33,13 @@ $ ./dbctl help
 usage: ./dbctl help                        # Display this usage message
 usage: ./dbctl start                       # Starts backend database container
 usage: ./dbctl stop                        # Stops backend database container
-usage: ./dbctl restart                     # Restarts backend database container
-usage: ./dbctl build                       # Issues docker-compose build call
+usage: ./dbctl restart                     # restarts backend database container
+usage: ./dbctl build                       # issues docker-compose build call
 usage: ./dbctl psql                        # Connects to backend database as postgres user
 usage: ./dbctl psql USER PASS DATABASE     # Connects to backend DATABASE as USER:PASS
 usage: ./dbctl purge                       # Remove backend database and container
+usage: ./dbctl pgadmin start               # Start the pgadmin container
+usage: ./dbctl pgadmin stop                # Stop the pgadmin container
 ```
 
 The `dbctl` script uses a **docker-compose.yml** file with the following default configuration. The PostgreSQL port will be opened on **5432** of the host it is being run on.
@@ -46,6 +53,12 @@ backend:
   ports:
   - "5432:5432"
   command: run
+pgadmin:
+  build: pgadmin4
+  container_name: pgadmin
+  ports:
+  - "5050:5050"
+  command: pgadmin
 ```
 
 ### start, stop, restart
@@ -194,6 +207,24 @@ Creating backend
 $ ./dbctl psql myuser mypassword mydatabase
 psql: FATAL:  password authentication failed for user "myuser"
 password retrieved from file "/root/.pgpass"
+```
+
+### pgadmin start
+
+Starts a container named **pgadmin** running pgAdmin4 on port 5050. If the container has not already been build, a `docker-compose build` call will be issued prior to starting the container.
+
+```
+$ ./dbctl pgadmin start
+Starting pgadmin
+```
+
+### pgadmin stop
+
+Stops the container named **pgadmin** running pgAdmin4 on port 5050.
+
+```
+$ ./dbctl pgadmin stop
+Stopping pgadmin ... done
 ```
 
 ## Persisting data between builds / purges
