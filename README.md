@@ -211,12 +211,25 @@ password retrieved from file "/root/.pgpass"
 
 ### pgadmin start
 
-Starts a container named **pgadmin** running pgAdmin4 on port 5050. If the container has not already been build, a `docker-compose build` call will be issued prior to starting the container.
+Starts a container named **pgadmin** running pgAdmin4 on port 5050. If the container has not already been built, a `docker-compose build` call will be issued prior to starting the container.
 
 ```
 $ ./dbctl pgadmin start
 Starting pgadmin
 ```
+
+The port being exposed can be changed by modifying the value in the **docker-compose.yml** file. For example, if you'd want to expose **pgadmin** on port 8080, the file woudl be updated as such.
+
+```yaml
+pgadmin:
+  build: pgadmin4
+  container_name: pgadmin
+  ports:
+  - "8080:5050"
+  command: pgadmin
+```
+
+If the **pgadmin** container was already running when the change to the port was made, it would need to be stopped and started again for the changes to take effect.
 
 ### pgadmin stop
 
