@@ -9,6 +9,11 @@ backend:
 pgadmin:
   build: pgadmin4
   container_name: pgadmin
+  environment:
+    PGADMIN_UID: 1000
+    PGADMIN_GID: 1000
+  volumes:
+    - "/var/pgadmin"
   ports:
   - "5050:5050"
   command: pgadmin

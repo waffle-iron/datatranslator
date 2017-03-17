@@ -29,7 +29,10 @@ RUN cp /tmp/docker-entrypoint.sh /docker-entrypoint.sh \
        gcc \
     && yum clean all
 
+ENV PGADMIN_UID=1000
+ENV PGADMIN_GID=1000
+
 ENTRYPOINT ["/docker-entrypoint.sh"]
 EXPOSE 5050
-
+VOLUME /var/pgadmin
 CMD ["pgadmin"]
