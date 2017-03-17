@@ -3,6 +3,7 @@ Local development for datatranslator
 
 - **backend**: PostgreSQL 9.5 with PostGIS 2.2.5
 - **pgadmin**: pgAdmin 4
+- **swagger**: swagger-editor
 
 ---
 
