@@ -1,36 +1,58 @@
+-- checkout bdtgreen database
 \c bdtgreen;
+
+-- create extensions
+CREATE EXTENSION postgis;
+CREATE EXTENSION postgis_topology;
+CREATE EXTENSION ogr_fdw;
+
+-- create a temporary table for holding the raw data
 CREATE TEMP TABLE tmp (
-    ID text,
-    COL text,
-    ROW text,
-    DATE text,
-    HOUR text,
-    O3 text,
-    PM25_PRIMARY text,
-    PM25_SECONDARY text
+    id TEXT,
+    lat TEXT,
+    lon TEXT,
+    col TEXT,
+    row TEXT,
+    date TEXT,
+    o3_ppb TEXT,
+    pm25_primary_ugm3 TEXT,
+    pm25_secondary_ugm3 TEXT
 );
-COPY tmp FROM '/sample_cmaq_output.csv' delimiter ',' CSV HEADER ;
-create table cmaq (
-    ID text,
-    COL integer,
-    ROW integer,
-    DATE date,
-    HOUR time,
-    O3 float,
-    PM25_PRIMARY float,
-    PM25_SECONDARY float
+
+-- copy the raw data from sample csv file
+COPY tmp FROM '/sample_cmaq_output.csv' DELIMITER ',' CSV HEADER ;
+
+-- create a table to load data into named cmaq
+CREATE TABLE cmaq (
+  id SERIAL PRIMARY KEY,
+  city_name TEXT,
+  latitude FLOAT,
+  longitude FLOAT,
+  location GEOGRAPHY(POINT,4326),
+  date_time TIMESTAMP,
+  ozone FLOAT,
+  pm25_primary FLOAT,
+  pm25_secondary FLOAT
 );
-INSERT INTO cmaq (ID, COL, ROW, DATE, HOUR, O3, PM25_PRIMARY, PM25_SECONDARY)
-SELECT
-    ID,
-    cast(COL as integer),
-    cast(ROW as integer),
-    to_date(DATE, 'YYYYMMDD'),
-    to_timestamp(LPAD(HOUR::text, 6, '0'), 'HH24MISS'),
-    cast(O3 as float),
-    cast(PM25_PRIMARY as float),
-    cast(PM25_SECONDARY as float)
-FROM tmp;
+
+-- load the cmaq table with properly formatted data
+INSERT INTO cmaq (city_name, latitude, longitude, location, date_time, ozone, pm25_primary, pm25_secondary)
+    SELECT
+      ID,
+      cast(LAT as FLOAT),
+      cast(LON as FLOAT),
+      ST_GeographyFromText('SRID=4326;POINT('||LAT||' '||LON||')'),
+      cast(DATE as TIMESTAMP),
+      cast(O3_PPB as FLOAT),
+      cast(PM25_PRIMARY_UGM3 as FLOAT),
+      cast(PM25_SECONDARY_UGM3 as FLOAT)
+    FROM tmp;
+
+-- drop the temporary table
 DROP TABLE tmp;
+
+-- set owner to datatrans user
 ALTER TABLE cmaq OWNER TO datatrans;
-SELECT * FROM cmaq;
+
+-- display a sample of contents to user
+SELECT * FROM cmaq ORDER BY date_time ASC LIMIT 10;
