@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 
-EDITOR_ID=editor
+EDITOR_ID=swagger-editor
 
 _usage() {
     echo "--- Swagger Usage ---"
     echo "usage: $0 help                        # Display this usage message"
-    echo "usage: $0 editor start                # Starts backend database container"
-    echo "usage: $0 editor stop                 # Stops backend database container"
+    echo "usage: $0 editor start                # Starts swagger-editor container"
+    echo "usage: $0 editor stop                 # Stops swagger-editor container"
 }
 
 _editor() {
     if [[ $# -ne 2 ]]; then
         echo "Invalid request..."
-        echo "usage: $0 editor start                # Starts backend database container"
-        echo "usage: $0 editor stop                 # Stops backend database container"
+        echo "usage: $0 editor start                # Starts swagger-editor container"
+        echo "usage: $0 editor stop                 # Stops swagger-editor container"
     else
         if [ "${2,,}" = 'start' ]; then
             if [[ -z "$(docker images | grep swagger-editor)" ]]; then
@@ -24,8 +24,8 @@ _editor() {
             docker-compose stop ${EDITOR_ID}
         else
             echo "Invalid request..."
-            echo "usage: $0 editor start                # Starts backend database container"
-            echo "usage: $0 editor stop                 # Stops backend database container"
+            echo "usage: $0 editor start                # Starts swagger-editor container"
+            echo "usage: $0 editor stop                 # Stops swagger-editor container"
         fi
     fi
 }
