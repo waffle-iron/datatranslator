@@ -56,6 +56,11 @@ backend:
 pgadmin:
   build: pgadmin4
   container_name: pgadmin
+  environment:
+    PGADMIN_UID: 1000
+    PGADMIN_GID: 1000
+  volumes:
+    - "/var/pgadmin"
   ports:
   - "5050:5050"
   command: pgadmin
@@ -224,8 +229,13 @@ The port being exposed can be changed by modifying the value in the **docker-com
 pgadmin:
   build: pgadmin4
   container_name: pgadmin
+  environment:
+    PGADMIN_UID: 1000
+    PGADMIN_GID: 1000
+  volumes:
+    - "/var/pgadmin"
   ports:
-  - "8080:5050"
+  - "8080:5050" # <-- Expose port 8080 of host
   command: pgadmin
 ```
 
@@ -253,9 +263,20 @@ backend:
   ports:
   - "5432:5432"
   command: run
+pgadmin:
+  build: pgadmin4
+  container_name: pgadmin
+  environment:
+    PGADMIN_UID: 1000
+    PGADMIN_GID: 1000
+  volumes:
+    - "/home/${USER}/pgadmin:/var/pgadmin"
+  ports:
+  - "5050:5050"
+  command: pgadmin
 ```
 
-Once the backend is started a directory will be created at the specified location. The ownership of the files may not coincide to any users on the host as they are relevant to the users defined within the container, and as such may only be viewable using the `sudo` command.
+Once the backend is started a directory will be created at the specified `/home/${USER}/pgdata` location. The ownership of the files may not coincide to any users on the host as they are relevant to the users defined within the container, and as such may only be viewable using the `sudo` command.
 
 ```
 $ ./dbctl start
@@ -266,6 +287,20 @@ drwxr-xr-x  3 root root 4.0K Mar 10 12:21 .
 drwxr-xr-x  3 root root 4.0K Mar 10 12:21 ..
 drwx------ 20   26 tape 4.0K Mar 10 12:21 data
 -rw-------  1   26 tape 1.3K Mar 10 12:21 initdb.log
+```
+
+Once the pgadmin container is started a directory will be created at the specified `/home/${USER}/pgadmin` location. The ownership of the files may not coincide to any users on the host as they are relevant to the users defined within the container by the **PGADMIN_UID** and **PGADMIN_GID** environment variables, and as such may only be viewable using the `sudo` command.
+
+```
+$ ./dbctl pgadmin start
+Creating pgadmin
+$ sudo ls -alh /home/$USER/pgadmin/.pgadmin
+total 5.7M
+drwx------ 3 docker docker 4.0K Mar 16 21:03 .
+drwxr-xr-x 3 docker docker 4.0K Mar 16 21:02 ..
+-rw------- 1 docker docker  34K Mar 16 21:03 pgadmin4-desktop.db
+-rw-r--r-- 1 docker docker 5.6M Mar 16 21:31 pgadmin4.log
+drwxr-xr-x 2 docker docker 4.0K Mar 16 21:02 sessions
 ```
 
 These directories will remain in place with whatever data has been populated to them until they are either removed from the host, or the volume definition is changed in the **docker-compose.yml** file.
