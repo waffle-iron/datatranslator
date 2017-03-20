@@ -25,23 +25,24 @@ CREATE TABLE IF NOT EXISTS cmaq (
   latitude FLOAT,
   longitude FLOAT,
   location GEOGRAPHY(POINT,4326),
-  date_time TIMESTAMP,
+  utc_date_time TIMESTAMP,
   ozone FLOAT,
   pm25_primary FLOAT,
   pm25_secondary FLOAT
 );
 
 -- load the cmaq table with properly formatted data
-INSERT INTO cmaq (city_name, latitude, longitude, location, date_time, ozone, pm25_primary, pm25_secondary)
+-- Using: Take either of the current values and assign 10% to Primary and 90% to Secondary
+INSERT INTO cmaq (city_name, latitude, longitude, location, utc_date_time, ozone, pm25_primary, pm25_secondary)
     SELECT
       ID,
-      cast(LAT as FLOAT),
-      cast(LON as FLOAT),
-      ST_GeographyFromText('SRID=4326;POINT('||LAT||' '||LON||')'),
-      cast(DATE as TIMESTAMP),
-      cast(O3_PPB as FLOAT),
-      cast(PM25_PRIMARY_UGM3 as FLOAT),
-      cast(PM25_SECONDARY_UGM3 as FLOAT)
+      cast(lat as FLOAT),
+      cast(lon as FLOAT),
+      ST_GeographyFromText('SRID=4326;POINT('||lat||' '||lon||')'),
+      cast(date as TIMESTAMP),
+      cast(o3_ppb as FLOAT),
+      cast(pm25_primary_ugm3 as FLOAT) * 0.10,
+      cast(pm25_secondary_ugm3 as FLOAT) * 0.90
     FROM tmp;
 
 -- drop the temporary table
@@ -51,4 +52,4 @@ DROP TABLE tmp;
 ALTER TABLE cmaq OWNER TO datatrans;
 
 -- display a sample of contents to user
-SELECT * FROM cmaq ORDER BY date_time ASC LIMIT 10;
+SELECT * FROM cmaq ORDER BY utc_date_time ASC LIMIT 10;
