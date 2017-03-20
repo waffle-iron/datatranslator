@@ -1,11 +1,3 @@
--- checkout bdtgreen database
-\c bdtgreen;
-
--- create extensions
-CREATE EXTENSION postgis;
-CREATE EXTENSION postgis_topology;
-CREATE EXTENSION ogr_fdw;
-
 -- create a temporary table for holding the raw data
 CREATE TEMP TABLE tmp (
     id TEXT,
@@ -20,10 +12,10 @@ CREATE TEMP TABLE tmp (
 );
 
 -- copy the raw data from sample csv file
-COPY tmp FROM '/sample_cmaq_output.csv' DELIMITER ',' CSV HEADER ;
+COPY tmp FROM '/cmaq_sample.csv' DELIMITER ',' CSV HEADER ;
 
 -- create a table to load data into named cmaq
-CREATE TABLE cmaq (
+CREATE TABLE IF NOT EXISTS cmaq (
   id SERIAL PRIMARY KEY,
   city_name TEXT,
   latitude FLOAT,
