@@ -1,6 +1,6 @@
 ## Sample data
 
-Example of loading sample data into a database named **bdtgreen** for use by a user named **datatrans**.
+Example of loading **cmaq** sample data into a database named **bdtgreen** for use by a user named **datatrans**.
 
 1. Start a new instance of backend
 
@@ -8,20 +8,23 @@ Example of loading sample data into a database named **bdtgreen** for use by a u
     $ ./dbctl start
     Creating backend
     ```
-2. Run the `sample-etl` script
+2. Run the `sample-data/setup-bdtgreen` script
 
     ```
-    $ ./sample-etl
+    $ cd sample-data/
+    $ ./setup-bdtgreen
     CREATE ROLE
     CREATE DATABASE
     GRANT
     CREATE EXTENSION
     CREATE EXTENSION
-    CREATE EXTENSION
-    You are now connected to database "bdtgreen" as user "postgres".
-    CREATE EXTENSION
-    CREATE EXTENSION
-    CREATE EXTENSION
+    CREATE EXTENSION    
+    ```
+3. Run the `sample-data/cmaq/load-cmaq-sample` script to load cmaq sample data into database bdtgreen
+
+    ```
+    $ cd cmaq/
+    $ ./load-cmaq-sample
     CREATE TABLE
     COPY 216
     CREATE TABLE
@@ -42,14 +45,14 @@ Example of loading sample data into a database named **bdtgreen** for use by a u
        4 | Raleigh     | 35.7795897 | -78.6381787 | 0101000020E610000034E66498C9E341403E6079EBD7A853C0 | 2010-01-01 03:00:00 | 15.6943092346191 | 8.31261157989502 | 8.31261157989502
     (10 rows)
     ```
-3. Connect to the database as the **datatrans** user and run a query.
+4. Connect to the database as the **datatrans** user and run a query.
 
     ```
-    $ cd ../
+    $ cd ../../
     $ ./dbctl psql datatrans somepassword bdtgreen
     psql (9.5.6)
     Type "help" for help.
-
+    
     bdtgreen=> select distinct city_name from cmaq;
       city_name
     -------------
@@ -57,4 +60,6 @@ Example of loading sample data into a database named **bdtgreen** for use by a u
      Durham
      Chapel Hill
     (3 rows)
+    
+    bdtgreen=> \q
     ```
