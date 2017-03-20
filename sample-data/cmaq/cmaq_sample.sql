@@ -1,3 +1,7 @@
+-- Format
+-- ID,Lat,Lon,Col,Row,Date,O3_ppb,PM25_Primary_ugm3,PM25_Secondary_ugm3
+-- Raleigh,35.7795897,-78.6381787,122,50,2010-01-01 00:00:00,4.67542219161987,10.2763252258301,10.2763252258301
+
 -- create a temporary table for holding the raw data
 CREATE TEMP TABLE tmp (
     id TEXT,

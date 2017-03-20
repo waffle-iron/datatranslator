@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# load cmaq_sample.csv and cmaq_sample.sql to backend container:
+docker cp pm25_sample.csv backend:/pm25_sample.csv
+docker cp pm25_sample.sql backend:/pm25_sample.sql
+
+# ingest sample data into cmaq table
+docker exec backend gosu postgres psql bdtgreen -f pm25_sample.sql
+
+exit 0;
