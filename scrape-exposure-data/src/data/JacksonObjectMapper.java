@@ -77,12 +77,20 @@ public class JacksonObjectMapper
 	
 	public static void main(String[] args) throws IOException, InterruptedException 
 	{
+		// check for exposure type arg - for now only except pm25 and o3
+		if ((args.length < 1) || (!args[0].equals("pm25") && !args[0].equals("o3"))){
+			System.out.println("Usage: java -jar scrape-exposure-data.jar <'pm25' or 'o3'>");
+			System.exit(1);
+		}
+		String exposureType = args[0];
+		
 		// create csv file and write headers
-		String csvFile = "pm25.csv";
+		String csvFile = exposureType + ".csv";
         FileWriter writer = new FileWriter(csvFile);
         CSVUtils.writeLine(writer,
         	Arrays.asList("utc_date", "local_date", "country", "city", "longitude", "latitude", "location", "parameter", "value", "unit"));
         
+        System.out.println("Collecting exposure data for type: " + exposureType + " ...");
         //get list of all city names in us
 		String json = call("https://api.openaq.org/v1/cities?country=US&limit=10000");
 
@@ -147,10 +155,9 @@ public class JacksonObjectMapper
 		    	{
 		    		//System.out.println("https://api.openaq.org/v1/measurements?format=csv&country=US&city=" + city);
 		    		// also need to query for location, since there can be multiple locations in one city
-		    		String pm25_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&parameter=pm25&country=US&city=" + city + "&location=" + loc);
-//		    		String O3_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&parameter=O3&country=US&city=" + city);
-		    		//System.out.println(pm25_measurments);
-		    		JSONObject jsonObj = new JSONObject(pm25_measurments.toString());
+		    		String exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType + "&city=" + city + "&location=" + loc);
+		    		//System.out.println(exp_measurments);
+		    		JSONObject jsonObj = new JSONObject(exp_measurments.toString());
 		    		
 		    		// if there are any air quality results associated with this city
 		    		// save them to the CSV file
@@ -174,12 +181,13 @@ public class JacksonObjectMapper
 				    						  ((JSONObject)resultSet.get(i)).get("unit").toString()
 				    					));
 		    			}
-//		    			System.out.println(pm25_measurments);
+//		    			System.out.println(exp_measurments);
 		    		}
 		    	}
 		    }
 		}
 		writer.flush();
         writer.close();
+        System.out.println("Done!");
 	}
 }
