@@ -100,7 +100,6 @@ public class JacksonObjectMapper
 		Iterator<Result> results = cs.getResults().iterator();
 		
 		List<String> cities = new ArrayList<String>();
-
 		
 	    while (results.hasNext()) 
 	    {
@@ -114,20 +113,10 @@ public class JacksonObjectMapper
 //	    int cnt = 0;
 		for (String city : cities) 
 		{		
-			if (city.equals("BIG HORN") ||
-				city.equals("Hartford-West Hartford-East Hartford") ||
-				city.equals("Holland-Grand Haven") ||
-				city.equals("Killeen-Temple-Fort Hood") ||
-				city.equals("Kokomo") ||
-				city.equals("Lake Havasu City-Kingman") ||
-				city.equals("New Haven-Milford") ||
-				city.equals("Niles-Benton Harbor") ||
-				city.equals("Panama City-Lynn Haven") ||
-				city.equals("Terre Haute")
-				) continue; // for some reason these cities give a 400 error code back
 			
+			String encodedCity = city.replaceAll(" ", "%20");
 //			System.out.println("making http call for city: " + city);
-	        String stateJson = call("https://api.openaq.org/v1/locations?country=US&city=" + city);
+	        String stateJson = call("https://api.openaq.org/v1/locations?country=US&city=" + encodedCity);
 	        
 	        ObjectMapper stateObjectMapper = new ObjectMapper();
 	        
@@ -138,7 +127,7 @@ public class JacksonObjectMapper
 		    while (rs.hasNext()) 
 		    {
 		    	Results r = rs.next();
-		    	String loc = r.getLocation();
+		    	String loc = r.getLocation().replaceAll(" ", "%20"); // need to encode spaces
 		    	
 		    	String state = call("http://data.fcc.gov/api/block/find?format=json&latitude="
 		    	+r.getCoordinates().getLatitude()+"&longitude="+r.getCoordinates().getLongitude()+"&showall=true");
@@ -153,9 +142,10 @@ public class JacksonObjectMapper
 		    	// now get air quality info for this city, since it is in NC
 		    	if(st.getState().get("code").equals("nc"))
 		    	{
-		    		//System.out.println("https://api.openaq.org/v1/measurements?format=csv&country=US&city=" + city);
 		    		// also need to query for location, since there can be multiple locations in one city
-		    		String exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType + "&city=" + city + "&location=" + loc);
+		    		//System.out.println("making http call for city: " + city + "  loc: " + loc);
+		    		String exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType + "&city=" + encodedCity + "&location=" + loc);
+
 		    		//System.out.println(exp_measurments);
 		    		JSONObject jsonObj = new JSONObject(exp_measurments.toString());
 		    		
