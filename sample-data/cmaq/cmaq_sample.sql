@@ -20,7 +20,7 @@ COPY tmp FROM '/cmaq_sample.csv' DELIMITER ',' CSV HEADER ;
 
 -- create a table to load data into named cmaq
 CREATE TABLE IF NOT EXISTS cmaq (
-  id SERIAL PRIMARY KEY,
+  id SERIAL UNIQUE PRIMARY KEY,
   city_name TEXT,
   latitude FLOAT,
   longitude FLOAT,

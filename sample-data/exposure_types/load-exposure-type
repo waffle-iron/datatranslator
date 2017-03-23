@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# load exposure_type.csv and exposure_type.sql to backend container:
+docker cp exposure_type.csv backend:/exposure_type.csv
+docker cp exposure_type.sql backend:/exposure_type.sql
+
+# ingest sample data into cmaq table
+docker exec backend gosu postgres psql bdtgreen -f exposure_type.sql
+
+exit 0;
