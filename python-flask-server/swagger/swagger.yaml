@@ -17,6 +17,8 @@ paths:
       summary: "Get list of exposure types"
       description: "Returns a list of all available exposure types"
       operationId: "controllers.default_controller.exposures_get"
+      produces:
+      - "application/json"
       parameters: []
       responses:
         200:
@@ -44,21 +46,21 @@ paths:
           \ ozone)."
         required: true
         type: "string"
-      - name: "start_time"
+      - name: "start_date"
         in: "query"
         description: "The starting date to obtain exposures for (example 1985-04-12\
           \ is April 12th 1985). Currently time of day is ignored."
         required: true
         type: "string"
         format: "date"
-      - name: "end_time"
+      - name: "end_date"
         in: "query"
         description: "The ending date to obtain exposures for (example 1985-04-13\
           \ is April 13th 1985). Currently time of day is ignored."
         required: true
         type: "string"
         format: "date"
-      - name: "location"
+      - name: "exposure_point"
         in: "query"
         description: "A description of the location(s) to retrieve the exposure for.\
           \ Locaton may be a single geocoordinate (example '35.720278,-79.176389')\
@@ -95,7 +97,7 @@ paths:
             items:
               $ref: "#/definitions/exposure"
         400:
-          description: "Invalid exposure parameters"
+          description: "Invalid exposure parameter"
         404:
           description: "Values not found for exposure type"
   /exposures/{exposure_type}/scores:
@@ -115,21 +117,21 @@ paths:
           \ ozone)."
         required: true
         type: "string"
-      - name: "start_time"
+      - name: "start_date"
         in: "query"
         description: "The starting date to obtain exposures for (example 1985-04-12\
           \ is April 12th 1985). Currently time of day is ignored."
         required: true
         type: "string"
         format: "date"
-      - name: "end_time"
+      - name: "end_date"
         in: "query"
         description: "The ending date to obtain exposures for (example 1985-04-13\
           \ is April 13th 1985). Currently time of day is ignored."
         required: true
         type: "string"
         format: "date"
-      - name: "location"
+      - name: "exposure_point"
         in: "query"
         description: "A description of the location(s) to retrieve the exposure for.\
           \ Locaton may be a single geocoordinate (example '35.720278,-79.176389')\
@@ -217,16 +219,16 @@ parameters:
     description: "The name of the exposure factor (currently limited to pm25, ozone)."
     required: true
     type: "string"
-  start_time:
-    name: "start_time"
+  start_date:
+    name: "start_date"
     in: "query"
     description: "The starting date to obtain exposures for (example 1985-04-12 is\
       \ April 12th 1985). Currently time of day is ignored."
     required: true
     type: "string"
     format: "date"
-  end_time:
-    name: "end_time"
+  end_date:
+    name: "end_date"
     in: "query"
     description: "The ending date to obtain exposures for (example 1985-04-13 is April\
       \ 13th 1985). Currently time of day is ignored."
@@ -257,8 +259,8 @@ parameters:
     required: false
     type: "string"
     default: "max"
-  location:
-    name: "location"
+  exposure_point:
+    name: "exposure_point"
     in: "query"
     description: "A description of the location(s) to retrieve the exposure for. Locaton\
       \ may be a single geocoordinate (example '35.720278,-79.176389') or a semicomma\

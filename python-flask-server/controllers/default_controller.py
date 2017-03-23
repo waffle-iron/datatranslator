@@ -8,7 +8,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 
-def exposures_exposure_type_scores_get(exposure_type, start_time, end_time, location, temporal_tesolution = None, score_type = None) -> str:
+def exposures_exposure_type_scores_get(exposure_type, start_date, end_date, exposure_point, temporal_tesolution = None, score_type = None) -> str:
     ret = session.query(exists().where(and_(ExposureType.exposure_type == exposure_type,
                                             ExposureType.has_values))).scalar()
     if not session.query(exists().where(ExposureType.exposure_type == exposure_type)).scalar():
@@ -20,7 +20,7 @@ def exposures_exposure_type_scores_get(exposure_type, start_time, end_time, loca
     return ret
 
 
-def exposures_exposure_type_values_get(exposure_type, start_time, end_time, location, temporal_tesolution = None, statistical_type = None) -> str:
+def exposures_exposure_type_values_get(exposure_type, start_date, end_date, exposure_point, temporal_tesolution = None, statistical_type = None) -> str:
     ret = session.query(exists().where(and_(ExposureType.exposure_type == exposure_type,
                                             ExposureType.has_values))).scalar()
     if not session.query(exists().where(ExposureType.exposure_type == exposure_type)).scalar():
