@@ -93,7 +93,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/exposures"
+              $ref: "#/definitions/exposure"
         400:
           description: "Invalid exposure parameters"
         404:
@@ -164,20 +164,19 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/exposures"
+              $ref: "#/definitions/exposure"
         400:
           description: "Invalid exposure parameters"
         404:
           description: "Scores not found for exposure type"
 definitions:
-  exposure_type:
-    type: "string"
   exposure:
+    type: "object"
     required:
     - "exposure_type"
     properties:
       exposure_type:
-        $ref: "#/definitions/exposure_type"
+        type: "string"
       start_time:
         type: "string"
         format: "date-time"
@@ -194,10 +193,23 @@ definitions:
       longitude:
         type: "string"
         format: "double"
-  exposures:
-    type: "array"
-    items:
-      $ref: "#/definitions/exposure"
+  exposure_type:
+    type: "object"
+    properties:
+      exposure_type:
+        type: "string"
+      description:
+        type: "string"
+      units:
+        type: "string"
+      has_values:
+        type: "string"
+        format: "boolean"
+      has_scores:
+        type: "string"
+        format: "boolean"
+      schema_version:
+        type: "string"
 parameters:
   exposure_type:
     name: "exposure_type"
