@@ -143,7 +143,7 @@ public class JacksonObjectMapper
 		    	if(st.getState().get("code").equals("nc"))
 		    	{
 		    		// also need to query for location, since there can be multiple locations in one city
-		    		//System.out.println("making http call for city: " + city + "  loc: " + loc);
+		    		System.out.println("making http call for city: " + encodedCity + "  loc: " + loc);
 		    		String exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType + "&city=" + encodedCity + "&location=" + loc);
 
 		    		//System.out.println(exp_measurments);
