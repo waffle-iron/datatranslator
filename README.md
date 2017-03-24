@@ -3,7 +3,10 @@ Local development for datatranslator
 
 - **backend**: PostgreSQL 9.5 with PostGIS 2.2.5
 - **pgadmin**: pgAdmin 4
-- **swagger**: swagger-editor
+- **swagger-editor**: swagger-editor
+- **python-flask-server**: connexion w/ gevent server
+    - `datatranslator/python-flask-server/requirements.txt` in develop branch
+    - [![Requirements Status](https://requires.io/github/mjstealey/datatranslator/requirements.svg?branch=develop)](https://requires.io/github/mjstealey/datatranslator/requirements/?branch=develop) 
 
 ---
 
