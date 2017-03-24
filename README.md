@@ -1,5 +1,10 @@
-# datatranslator
-Local development for datatranslator
+# Environmental Exposure API
+
+Example at: [bdtgis.renci.org](http://bdtgis.renci.org:9090/v1/ui/#/default)
+
+## Development Environment
+
+Local development for datatranslator implemented in docker
 
 - **backend**: PostgreSQL 9.5 with PostGIS 2.2.5
 - **pgadmin**: pgAdmin 4
