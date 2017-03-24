@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -78,11 +79,26 @@ public class JacksonObjectMapper
 	public static void main(String[] args) throws IOException, InterruptedException 
 	{
 		// check for exposure type arg - for now only except pm25 and o3
+		// optionally query within specific date range
 		if ((args.length < 1) || (!args[0].equals("pm25") && !args[0].equals("o3"))){
-			System.out.println("Usage: java -jar scrape-exposure-data.jar <'pm25' or 'o3'>");
+			System.out.println("Usage: java -jar scrape-exposure-data.jar <'pm25' or 'o3'> [from_date [to_date]");
 			System.exit(1);
 		}
 		String exposureType = args[0];
+		
+		// set dates for query time frame - optional
+		// if date_to is not specified, now (in UTC) will be used
+		String date_from = null;
+		String date_to = null;
+		if (args.length > 1) {
+			date_from = args[1];
+			if (args.length > 2) {
+				date_to = args[2];
+			}
+			else {
+				date_to = Instant.now().toString();
+			}
+		}
 		
 		// create csv file and write headers
 		String csvFile = exposureType + ".csv";
@@ -144,8 +160,20 @@ public class JacksonObjectMapper
 		    	{
 		    		// also need to query for location, since there can be multiple locations in one city
 		    		System.out.println("making http call for city: " + encodedCity + "  loc: " + loc);
-		    		String exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType + "&city=" + encodedCity + "&location=" + loc);
-
+		    		String exp_measurments = null;
+		    		if (date_from != null) {
+		    			exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType
+		    									+ "&city=" + encodedCity
+		    									+ "&location=" + loc
+		    									+ "&date_from=" + date_from
+		    									+ "&date_to=" + date_to);
+		    		}
+		    		else {
+		    			exp_measurments = call("https://api.openaq.org/v1/measurements?limit=100000&country=US&parameter=" + exposureType
+		    									+ "&city=" + encodedCity
+		    									+ "&location=" + loc);
+		    		}
+		    		
 		    		//System.out.println(exp_measurments);
 		    		JSONObject jsonObj = new JSONObject(exp_measurments.toString());
 		    		
