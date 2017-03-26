@@ -4,6 +4,7 @@ from models import Cmaq, ExposureType
 from flask import jsonify
 import importlib
 import sys
+
 sys.path.append('/Users/stealey/Github/datatranslator/python-flask-server/exposures')
 
 engine = create_engine('postgres://datatrans:somepassword@192.168.56.101:5432/bdtgreen')
@@ -22,7 +23,8 @@ def exposures_exposure_type_scores_get(exposure_type, start_date, end_date, expo
         return 'Not Found', 404, {'x-error': 'Values not found for exposure type'}
 
     mod = importlib.import_module(exposure_type)
-    data = mod.get_scores(locals())
+    kwargs = locals()
+    data = mod.get_scores(**kwargs)
     return data
 
 
@@ -37,7 +39,8 @@ def exposures_exposure_type_values_get(exposure_type, start_date, end_date, expo
         return 'Not Found', 404, {'x-error': 'Values not found for exposure type'}
 
     mod = importlib.import_module(exposure_type)
-    data = mod.get_values(locals())
+    kwargs = locals()
+    data = mod.get_values(**kwargs)
     return data
 
 
