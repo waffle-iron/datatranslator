@@ -22,29 +22,37 @@ exp = GetPm25ExposureData()
 
 def get_values(**kwargs):
     print(kwargs)
-    args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
+    date_args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
             'end_date': kwargs.get('end_date')}
-    (valid_date, message) = exp.date_validation(**args)
+    (valid_date, message) = exp.date_validation(**date_args)
     if not valid_date:
         return message
     if kwargs.get('temporal_resolution') not in temporal_resolution_set:
-        return 'Not Found', 400, {'x-error': 'Invalid temporal resolution'}
+        return 'Not Found', 400, {'x-error': 'Invalid temporal_resolution'}
     if kwargs.get('statistical_type') not in statistical_type_set:
-        return 'Not Found', 400, {'x-error': 'Invalid statistical type'}
+        return 'Not Found', 400, {'x-error': 'Invalid statistical_type'}
+    point_args = {'exposure_point': kwargs.get('exposure_point')}
+    (valid_points, message, point_list) = exp.serialize_exposure_point(**point_args)
+    if not valid_points:
+        return message
 
-    return 'Hi pm25 values'
+    return point_list
 
 
 def get_scores(**kwargs):
     print(kwargs)
-    args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
+    date_args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
             'end_date': kwargs.get('end_date')}
-    (valid_date, message) = exp.date_validation(**args)
+    (valid_date, message) = exp.date_validation(**date_args)
     if not valid_date:
         return message
     if kwargs.get('temporal_resolution') not in temporal_resolution_set:
-        return 'Not Found', 400, {'x-error': 'Invalid temporal resolution'}
+        return 'Not Found', 400, {'x-error': 'Invalid temporal_resolution'}
     if kwargs.get('score_type') not in score_type_set:
-        return 'Not Found', 400, {'x-error': 'Invalid score type'}
+        return 'Not Found', 400, {'x-error': 'Invalid score_type'}
+    point_args = {'exposure_point': kwargs.get('exposure_point')}
+    (valid_points, message, point_list) = exp.serialize_exposure_point(**point_args)
+    if not valid_points:
+        return message
 
-    return 'Hi pm25 scores'
+    return point_list
