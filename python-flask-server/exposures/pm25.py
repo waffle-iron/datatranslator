@@ -24,7 +24,7 @@ def get_values(**kwargs):
     print(kwargs)
     date_args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
             'end_date': kwargs.get('end_date')}
-    (valid_date, message) = exp.date_validation(**date_args)
+    (valid_date, message) = exp.validate_date_range(**date_args)
     if not valid_date:
         return message
     if kwargs.get('temporal_resolution') not in temporal_resolution_set:
@@ -32,7 +32,7 @@ def get_values(**kwargs):
     if kwargs.get('statistical_type') not in statistical_type_set:
         return 'Not Found', 400, {'x-error': 'Invalid statistical_type'}
     point_args = {'exposure_point': kwargs.get('exposure_point')}
-    (valid_points, message, point_list) = exp.serialize_exposure_point(**point_args)
+    (valid_points, message, point_list) = exp.validate_exposure_point(**point_args)
     if not valid_points:
         return message
 
@@ -43,7 +43,7 @@ def get_scores(**kwargs):
     print(kwargs)
     date_args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
             'end_date': kwargs.get('end_date')}
-    (valid_date, message) = exp.date_validation(**date_args)
+    (valid_date, message) = exp.validate_date_range(**date_args)
     if not valid_date:
         return message
     if kwargs.get('temporal_resolution') not in temporal_resolution_set:
@@ -51,7 +51,7 @@ def get_scores(**kwargs):
     if kwargs.get('score_type') not in score_type_set:
         return 'Not Found', 400, {'x-error': 'Invalid score_type'}
     point_args = {'exposure_point': kwargs.get('exposure_point')}
-    (valid_points, message, point_list) = exp.serialize_exposure_point(**point_args)
+    (valid_points, message, point_list) = exp.validate_exposure_point(**point_args)
     if not valid_points:
         return message
 
