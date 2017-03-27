@@ -1,8 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import *
+from configparser import ConfigParser
 
-engine = create_engine('postgres://datatrans:somepassword@192.168.56.101:5432/bdtgreen')
+parser = ConfigParser()
+parser.read('ini/connexion.ini')
+SYSPATH_EXPOSURES = parser.get('sys-path', 'exposures')
+POSTGRES_ENGINE = 'postgres://' + parser.get('postgres', 'username') + ':' + parser.get('postgres', 'password') \
+                  + '@' + parser.get('postgres', 'host') + ':' + parser.get('postgres', 'port') \
+                  + '/' + parser.get('postgres', 'database')
+sys.path.append(SYSPATH_EXPOSURES)
+engine = create_engine(POSTGRES_ENGINE)
 Session = sessionmaker(bind=engine)
 session = Session()
 
