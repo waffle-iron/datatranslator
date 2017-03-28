@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from datetime import *
+from datetime import datetime, date, timedelta
 from configparser import ConfigParser
+import sys
 
 parser = ConfigParser()
 parser.read('ini/connexion.ini')
@@ -66,10 +67,10 @@ class GetExposureData(object):
         end_time_set = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11',
                         '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'}
 
-        points = [{'point': p.split(',')} for p in args.get('exposure_point').split(';')]
+        points = [p.split(',') for p in args.get('exposure_point').split(';')]
         for p in points:
-            if len(p.get('point')) == 3:
-                duration = p.get('point')[2]
+            if len(p) == 3:
+                duration = p[2]
                 if len(duration) == 2:
                     if duration[0:2] not in weekday_set:
                         return False, ('Not Found', 400, {'x-error': 'Invalid exposure_point weekday'}), []
@@ -89,6 +90,10 @@ class GetExposureData(object):
                     return False, ('Not Found', 400, {'x-error': 'Invalid exposure_point'}), []
 
         return True, '', points
+
+    def get_date_list(self, **kwargs):
+        date_list = ([datetime.strftime(datetime.strptime(kwargs.get('start_date'), '%Y-%m-%d').date() + timedelta(days=i), '%Y-%m-%d')] for i in range(((datetime.strptime(kwargs.get('end_date'), '%Y-%m-%d')) - (datetime.strptime(kwargs.get('start_date'), '%Y-%m-%d'))).days + 1))
+        return date_list
 
     def get_values(self, **kwargs):
         raise NotImplemented

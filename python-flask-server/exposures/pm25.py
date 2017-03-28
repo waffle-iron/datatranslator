@@ -3,14 +3,35 @@ from basemodule import GetExposureData
 class GetPm25ExposureData(GetExposureData):
 
     def get_values(self, **kwargs):
+        # print(kwargs)
         # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
         #  'end_date': '2001-02-01', 'start_date': '2001-01-02', 'exposure_type': 'pm25'}}
-        return 'pm25 values'
+
+        (valid_points, message, point_list) = GetExposureData.validate_exposure_point(self, **kwargs)
+        if not valid_points:
+            return message
+        date_list = GetExposureData.get_date_list(self, **kwargs)
+
+        for dt in date_list:
+            for pt in point_list:
+                print(dt, pt)
+
+        return point_list
 
     def get_scores(self, **kwargs):
         # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
         #  'end_date': '2001-02-01', 'start_date': '2001-01-02', 'exposure_type': 'pm25'}}
-        return 'pm25 scores'
+
+        (valid_points, message, point_list) = GetExposureData.validate_exposure_point(self, **kwargs)
+        if not valid_points:
+            return message
+        date_list = GetExposureData.get_date_list(self, **kwargs)
+
+        for dt in date_list:
+            for pt in point_list:
+                print(dt, pt)
+
+        return point_list
 
 # Define valid parameter sets
 temporal_resolution_set = {'hour', 'day'}
@@ -21,7 +42,7 @@ exp = GetPm25ExposureData()
 
 
 def get_values(**kwargs):
-    print(kwargs)
+    # print(kwargs)
     date_args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
             'end_date': kwargs.get('end_date')}
     (valid_date, message) = exp.validate_date_range(**date_args)
@@ -31,12 +52,8 @@ def get_values(**kwargs):
         return 'Not Found', 400, {'x-error': 'Invalid temporal_resolution'}
     if kwargs.get('statistical_type') not in statistical_type_set:
         return 'Not Found', 400, {'x-error': 'Invalid statistical_type'}
-    point_args = {'exposure_point': kwargs.get('exposure_point')}
-    (valid_points, message, point_list) = exp.validate_exposure_point(**point_args)
-    if not valid_points:
-        return message
 
-    return point_list
+    return exp.get_values(**kwargs)
 
 
 def get_scores(**kwargs):
@@ -50,9 +67,5 @@ def get_scores(**kwargs):
         return 'Not Found', 400, {'x-error': 'Invalid temporal_resolution'}
     if kwargs.get('score_type') not in score_type_set:
         return 'Not Found', 400, {'x-error': 'Invalid score_type'}
-    point_args = {'exposure_point': kwargs.get('exposure_point')}
-    (valid_points, message, point_list) = exp.validate_exposure_point(**point_args)
-    if not valid_points:
-        return message
 
-    return point_list
+    return exp.get_scores(**kwargs)

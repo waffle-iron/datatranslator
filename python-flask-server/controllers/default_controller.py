@@ -8,11 +8,10 @@ from configparser import ConfigParser
 
 parser = ConfigParser()
 parser.read('ini/connexion.ini')
-SYSPATH_EXPOSURES = parser.get('sys-path', 'exposures')
 POSTGRES_ENGINE = 'postgres://' + parser.get('postgres', 'username') + ':' + parser.get('postgres', 'password') \
                   + '@' + parser.get('postgres', 'host') + ':' + parser.get('postgres', 'port') \
                   + '/' + parser.get('postgres', 'database')
-sys.path.append(SYSPATH_EXPOSURES)
+sys.path.append(parser.get('sys-path', 'exposures'))
 engine = create_engine(POSTGRES_ENGINE)
 Session = sessionmaker(bind=engine)
 session = Session()
