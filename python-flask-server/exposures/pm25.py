@@ -1,4 +1,19 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from basemodule import GetExposureData
+from configparser import ConfigParser
+from flask import jsonify
+import sys
+
+parser = ConfigParser()
+parser.read('ini/connexion.ini')
+POSTGRES_ENGINE = 'postgres://' + parser.get('postgres', 'username') + ':' + parser.get('postgres', 'password') \
+                  + '@' + parser.get('postgres', 'host') + ':' + parser.get('postgres', 'port') \
+                  + '/' + parser.get('postgres', 'database')
+sys.path.append(parser.get('sys-path', 'exposures'))
+engine = create_engine(POSTGRES_ENGINE)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 class GetPm25ExposureData(GetExposureData):
 
@@ -11,12 +26,20 @@ class GetPm25ExposureData(GetExposureData):
         if not valid_points:
             return message
         date_list = GetExposureData.get_date_list(self, **kwargs)
-
+        sql_array = []
         for dt in date_list:
             for pt in point_list:
-                print(dt, pt)
+                sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) from cmaq " \
+                      "where cast(utc_date_time as date) = cast('" + \
+                      dt[0] + "' as date) and latitude = " + pt[0] + " and longitude = " + pt[1] + ";"
+                result = session.execute(sql).scalar()
+                sql_array.append([dt[0] + ' 00:00:00', dt[0] + ' 23:00:00', pt[0], pt[1], result])
 
-        return point_list
+        data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
+                         'start_time': o[0], 'units': 'ugm3', 'value': o[4]
+                         } for o in sql_array])
+
+        return data
 
     def get_scores(self, **kwargs):
         # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
