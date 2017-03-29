@@ -2,7 +2,7 @@ backend:
   build: backend
   container_name: backend
   volumes:
-  - "/var/lib/pgsql"
+  - "/home/${USER}/pgdata:/var/lib/pgsql"
   ports:
   - "5432:5432"
   command: run

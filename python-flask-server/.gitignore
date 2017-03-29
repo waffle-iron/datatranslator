@@ -1,2 +1,4 @@
 venv3
 __pycache__
+ini/connexion-template.ini
+ini/connexion.ini
