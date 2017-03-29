@@ -6,37 +6,39 @@ import sys
 
 parser = ConfigParser()
 parser.read('ini/connexion.ini')
-SYSPATH_EXPOSURES = parser.get('sys-path', 'exposures')
 POSTGRES_ENGINE = 'postgres://' + parser.get('postgres', 'username') + ':' + parser.get('postgres', 'password') \
                   + '@' + parser.get('postgres', 'host') + ':' + parser.get('postgres', 'port') \
                   + '/' + parser.get('postgres', 'database')
-sys.path.append(SYSPATH_EXPOSURES)
+sys.path.append(parser.get('sys-path', 'exposures'))
 engine = create_engine(POSTGRES_ENGINE)
 Session = sessionmaker(bind=engine)
-session = Session()
 
 
 class GetExposureData(object):
 
     def is_before_date_range(self, *args):
+        session = Session()
         date_table = args[0]
         date_column = args[1]
         date_to_compare = datetime.strptime(args[2], '%Y-%m-%d')
         sql = ('select min(' + date_column + ') from ' + date_table + ';')
         min_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
         min_date = datetime.strptime(min_date, '%Y-%m-%d')
+        session.close()
         if min_date > date_to_compare:
             return True
 
         return False
 
     def is_after_date_range(self, *args):
+        session = Session()
         date_table = args[0]
         date_column = args[1]
         date_to_compare = datetime.strptime(args[2], '%Y-%m-%d')
         sql = ('select max(' + date_column + ') from ' + date_table + ';')
         max_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
         max_date = datetime.strptime(max_date, '%Y-%m-%d')
+        session.close()
         if max_date < date_to_compare:
             return True
 

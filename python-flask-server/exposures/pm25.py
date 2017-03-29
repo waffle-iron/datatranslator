@@ -14,7 +14,6 @@ POSTGRES_ENGINE = 'postgres://' + parser.get('postgres', 'username') + ':' + par
 sys.path.append(parser.get('sys-path', 'exposures'))
 engine = create_engine(POSTGRES_ENGINE)
 Session = sessionmaker(bind=engine)
-session = Session()
 
 class GetPm25ExposureData(GetExposureData):
 
@@ -22,7 +21,7 @@ class GetPm25ExposureData(GetExposureData):
         # print(kwargs)
         # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
         #  'end_date': '2001-02-01', 'start_date': '2001-01-02', 'exposure_type': 'pm25'}}
-
+        session = Session()
         (valid_points, message, point_list) = GetExposureData.validate_exposure_point(self, **kwargs)
         if not valid_points:
             return message
@@ -43,13 +42,13 @@ class GetPm25ExposureData(GetExposureData):
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
                          'start_time': o[0], 'units': 'ugm3', 'value': o[4]
                          } for o in sql_array])
-
+        session.close()
         return data
 
     def get_scores(self, **kwargs):
         # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
         #  'end_date': '2001-02-01', 'start_date': '2001-01-02', 'exposure_type': 'pm25'}}
-
+        session = Session()
         (valid_points, message, point_list) = GetExposureData.validate_exposure_point(self, **kwargs)
         if not valid_points:
             return message
@@ -66,7 +65,6 @@ class GetPm25ExposureData(GetExposureData):
                 # 3: 24h max PM2.5 7.007-8.97 μg/m3
                 # 4: 24h max PM 2.5 8.98-11.36 μg/m3
                 # 5: 24h max PM2.5 > 11.37 μg/m3
-                print(result)
                 if not result:
                     result = 'Not Available'
                 elif result < 4.0:
@@ -87,7 +85,7 @@ class GetPm25ExposureData(GetExposureData):
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
                          'start_time': o[0], 'units': kwargs.get('score_type'), 'value': o[4]
                          } for o in sql_array])
-
+        session.close()
         return data
 
 # Define valid parameter sets
