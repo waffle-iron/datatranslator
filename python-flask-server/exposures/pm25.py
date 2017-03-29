@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from basemodule import GetExposureData
 from configparser import ConfigParser
 from flask import jsonify
+from datetime import datetime
 import sys
 
 parser = ConfigParser()
@@ -33,7 +34,11 @@ class GetPm25ExposureData(GetExposureData):
                       "where cast(utc_date_time as date) = cast('" + \
                       dt[0] + "' as date) and latitude = " + pt[0] + " and longitude = " + pt[1] + ";"
                 result = session.execute(sql).scalar()
-                sql_array.append([dt[0] + ' 00:00:00', dt[0] + ' 23:00:00', pt[0], pt[1], result])
+                if not result:
+                    result = 'Not Available'
+                sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
+                                  datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
+                                  pt[0], pt[1], str(result)])
 
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
                          'start_time': o[0], 'units': 'ugm3', 'value': o[4]
@@ -49,12 +54,41 @@ class GetPm25ExposureData(GetExposureData):
         if not valid_points:
             return message
         date_list = GetExposureData.get_date_list(self, **kwargs)
-
+        sql_array = []
         for dt in date_list:
             for pt in point_list:
-                print(dt, pt)
+                sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) from cmaq " \
+                      "where cast(utc_date_time as date) = cast('" + \
+                      dt[0] + "' as date) and latitude = " + pt[0] + " and longitude = " + pt[1] + ";"
+                result = session.execute(sql).scalar()
+                # 1: 24h max PM2.5 < 4.0 μg/m3
+                # 2: 24h max PM2.5 4.0-7.06 μg/m3
+                # 3: 24h max PM2.5 7.007-8.97 μg/m3
+                # 4: 24h max PM 2.5 8.98-11.36 μg/m3
+                # 5: 24h max PM2.5 > 11.37 μg/m3
+                print(result)
+                if not result:
+                    result = 'Not Available'
+                elif result < 4.0:
+                    result = 1
+                elif 4.0 <= result < 7.06:
+                    result = 2
+                elif 7.06 <= result < 8.97:
+                    result = 3
+                elif 8.97 <= result < 11.36:
+                    result = 4
+                elif result >= 11.36:
+                    result = 5
 
-        return point_list
+                sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
+                                  datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
+                                  pt[0], pt[1], str(result)])
+
+        data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
+                         'start_time': o[0], 'units': kwargs.get('score_type'), 'value': o[4]
+                         } for o in sql_array])
+
+        return data
 
 # Define valid parameter sets
 temporal_resolution_set = {'hour', 'day'}
