@@ -86,7 +86,7 @@ At this time there are two files that control the configuration of the final dep
 	API_SERVER_HOST=localhost	# FQDN or IP of service exposure to the outside
 	API_SERVER_PORT=8080		# Port of service exposure to the outside
 	...
-```
+	```
 
 When issuing the script an option **-b** or **--build** can be passed in to trigger a rebuilding of the api-server image used to run the API web server.
 
