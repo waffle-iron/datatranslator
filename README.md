@@ -313,3 +313,93 @@ drwxr-xr-x 2 docker docker 4.0K Mar 16 21:02 sessions
 ```
 
 These directories will remain in place with whatever data has been populated to them until they are either removed from the host, or the volume definition is changed in the **docker-compose.yml** file.
+
+## Local Docker Deploy
+
+The script named `local-docker-deploy` will attemp to deploy both the backend [PostgreSQL database](https://github.com/mjstealey/datatranslator/tree/develop/backend) (populated with sample data) using the [dbctl](https://github.com/mjstealey/datatranslator/blob/develop/dbctl) script, and the python flask server using the [run-in-docker](https://github.com/mjstealey/datatranslator/blob/develop/run-in-docker) script on the local system in Docker.
+
+At this time there are two files that control the configuration of the final deploy.
+
+
+1. **python-flask-server/ini/connexion-template.ini** - configParser ini file (see # commented notes)
+
+
+	```
+	; template ini file for running the development server
+	; in docker with debug mode on
+	[connexion]
+	server =			# defines server type, blank = development
+	debug = True		# whether debug is enabled
+	port = 8080		
+	
+	[sys-path]
+	exposures = /datatranslator/exposures
+	
+	[postgres]
+	host = backend
+	port = 5432
+	database = bdtgreen
+	username = datatrans
+	password = somepassword
+	```
+
+2. **python-flask-server/run-in-docker** - bash script to launch api-server (see # commented notes)
+
+	```
+	#!/usr/bin/env bash
+	
+	API_SERVER_HOST=localhost	# FQDN or IP of service exposure to the outside
+	API_SERVER_PORT=8080		# Port of service exposure to the outside
+	...
+```
+
+When issuing the script an option **-b** or **--build** can be passed in to trigger a rebuilding of the api-server image used to run the API web server.
+
+Example:
+
+```
+$ ./local-docker-deploy --build
+Stopping backend ... done
+Going to remove backend
+Removing backend ... done
+Creating backend
+...
+ALTER TABLE
+  id  |  city_name  |  latitude  |  longitude  |                      location                      |    utc_date_time    |      ozone       |   pm25_primary    |  pm25_secondary
+------+-------------+------------+-------------+----------------------------------------------------+---------------------+------------------+-------------------+------------------
+    1 | Raleigh     | 35.7795897 | -78.6381787 | 0101000020E610000034E66498C9E341403E6079EBD7A853C0 | 2010-01-01 00:00:00 | 4.67542219161987 |  1.02763252258301 | 9.24869270324709
+  745 | Durham      | 35.9940329 |  -78.898619 | 0101000020E6100000F35256783CFF41401C2444F982B953C0 | 2010-01-01 00:00:00 |  3.8005747795105 | 0.651982355117798 | 5.86784119606018
+ 1489 | Chapel Hill | 35.9131996 | -79.0558445 | 0101000020E6100000325C78B9E3F44140564ACFF492C353C0 | 2010-01-01 00:00:00 |  11.511438369751 | 0.660837078094482 | 5.94753370285034
+    2 | Raleigh     | 35.7795897 | -78.6381787 | 0101000020E610000034E66498C9E341403E6079EBD7A853C0 | 2010-01-01 01:00:00 | 10.6597690582275 |  0.86428804397583 | 7.77859239578247
+  746 | Durham      | 35.9940329 |  -78.898619 | 0101000020E6100000F35256783CFF41401C2444F982B953C0 | 2010-01-01 01:00:00 | 9.16897773742676 | 0.706193399429321 | 6.35574059486389
+ 1490 | Chapel Hill | 35.9131996 | -79.0558445 | 0101000020E6100000325C78B9E3F44140564ACFF492C353C0 | 2010-01-01 01:00:00 | 15.7613143920898 |  0.69754753112793 | 6.27792778015137
+  747 | Durham      | 35.9940329 |  -78.898619 | 0101000020E6100000F35256783CFF41401C2444F982B953C0 | 2010-01-01 02:00:00 | 14.1381168365479 | 0.693615484237671 | 6.24253935813904
+    3 | Raleigh     | 35.7795897 | -78.6381787 | 0101000020E610000034E66498C9E341403E6079EBD7A853C0 | 2010-01-01 02:00:00 | 11.7991485595703 | 0.897025680541992 | 8.07323112487793
+ 1491 | Chapel Hill | 35.9131996 | -79.0558445 | 0101000020E6100000325C78B9E3F44140564ACFF492C353C0 | 2010-01-01 02:00:00 | 19.2165870666504 | 0.686179161071777 | 6.17561244964599
+    4 | Raleigh     | 35.7795897 | -78.6381787 | 0101000020E610000034E66498C9E341403E6079EBD7A853C0 | 2010-01-01 03:00:00 | 15.6943092346191 | 0.831261157989502 | 7.48135042190552
+(10 rows)
+
+...
+ALTER TABLE
+ id | exposure_type |      description       | units | has_values | has_scores | schema_version
+----+---------------+------------------------+-------+------------+------------+----------------
+  2 | o3            | ozone                  | ppm   | f          | f          | 1.0.0
+  1 | pm25          | particulate matter 2.5 | ugm3  | t          | t          | 1.0.0
+(2 rows)
+
+api-server
+api-server
+Untagged: api-server:latest
+Deleted: sha256:3d1e2d0889583cfd581cd2ad02e17dbeb625dd1bda19484a67e8d167697409b5
+...
+Step 8/8 : CMD api
+ ---> Running in 294c875cc949
+ ---> af8cfebcc17d
+Removing intermediate container 294c875cc949
+Successfully built af8cfebcc17d
+0f7e835e2c084913d5a4fc47e25e1a06553497bbd2958f5bb3dc38230563cc4d
+```
+
+Based on the above sample configuration the API web service would be available on the local machine at [http://localhost:8080/v1/ui/](http://localhost:8080/v1/ui/#/)
+
+**NOTE**: By default the script will stop and purge the backend datbase container, then rebuild it using the sample data scripts in the repository. This can become promblematic if the user has chosen to preserve the database contents locally as it will then generate duplicates of prior data due to the current behavior of the loading script.

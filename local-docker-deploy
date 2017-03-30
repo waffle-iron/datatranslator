@@ -2,8 +2,12 @@
 
 LOCAL_HOME=$(pwd)
 
+# purge prior backend
+./dbctl purge
+
 # Launch database backend
 ./dbctl start
+sleep 10s
 
 # Setup database bdtgreen and user datatrans
 cd ${LOCAL_HOME}/sample-data/
@@ -14,7 +18,11 @@ cd ${LOCAL_HOME}/sample-data/cmaq/
 ./load-cmaq-sample
 
 # Load ExposureType data
-cd ${LOCAL_HOME}/sample-data/exposure_types
+cd ${LOCAL_HOME}/sample-data/exposure_types/
 ./load-exposure-type
+
+# Setup api server
+cd ${LOCAL_HOME}/python-flask-server/
+./run-in-docker "$@"
 
 exit 0;
