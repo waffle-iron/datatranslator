@@ -12,7 +12,7 @@ fi
 if [[ -n $(docker ps -a | grep api-server) ]]; then
     docker stop api-server
     docker rm -fv api-server
-    if [[ -n "$1" && ( ${1} = "--build" || ${1} = "-b" ) ]]; then
+    if [[ -n ${1} && ( ${1} = "--build" || ${1} = "-b" ) ]]; then
         docker rmi -f api-server
     fi
 fi

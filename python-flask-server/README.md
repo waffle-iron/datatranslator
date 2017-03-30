@@ -49,3 +49,62 @@ Your Swagger definition lives here:
 http://localhost:8080/mjstealey/environmental/v1/swagger.json
 ```
 
+## Run in Docker
+
+A script named **run-in-docker** is provided to run the API web server in a Docker container. 
+
+At this time there are two files that control the configuration of the final deploy.
+
+
+1. **python-flask-server/ini/connexion-template.ini** - configParser ini file (see # commented notes)
+
+
+	```
+	; template ini file for running the development server
+	; in docker with debug mode on
+	[connexion]
+	server =			# defines server type, blank = development
+	debug = True		# whether debug is enabled
+	port = 8080		
+	
+	[sys-path]
+	exposures = /datatranslator/exposures
+	
+	[postgres]
+	host = backend				# Hostname of PostgreSQL server to connect to
+	port = 5432					# Port of PostgreSQL server to connect to
+	database = bdtgreen			# Name of database
+	username = datatrans		# Name of database user
+	password = somepassword		# Password of database user
+	```
+
+2. **python-flask-server/run-in-docker** - bash script to launch api-server (see # commented notes)
+
+	```
+	#!/usr/bin/env bash
+	
+	API_SERVER_HOST=localhost	# FQDN or IP of service exposure to the outside
+	API_SERVER_PORT=8080		# Port of service exposure to the outside
+	...
+```
+
+When issuing the script an option **-b** or **--build** can be passed in to trigger a rebuilding of the api-server image used to run the API web server.
+
+Example:
+
+```
+$ ./run-in-docker --build
+api-server
+api-server
+Untagged: api-server:latest
+Deleted: sha256:af8cfebcc17d3055c09bfc3dc01e57ccd53bd5207f5ea3948432cfe3d9f08ec2
+...
+Step 8/8 : CMD api
+ ---> Running in 3b611e40bb93
+ ---> 17b057e8735d
+Removing intermediate container 3b611e40bb93
+Successfully built 17b057e8735d
+fe7cff542cdbed39e95d88392603e74b2dc79a1aa60a6d6b925761cbbb62900c
+```
+
+Based on the above sample configuration the API web service would be available on the local machine at [http://localhost:8080/v1/ui/](http://localhost:8080/v1/ui/#/)
