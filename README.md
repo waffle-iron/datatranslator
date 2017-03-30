@@ -351,7 +351,7 @@ At this time there are two files that control the configuration of the final dep
 	API_SERVER_HOST=localhost	# FQDN or IP of service exposure to the outside
 	API_SERVER_PORT=8080		# Port of service exposure to the outside
 	...
-```
+	```
 
 When issuing the script an option **-b** or **--build** can be passed in to trigger a rebuilding of the api-server image used to run the API web server.
 
@@ -378,7 +378,6 @@ ALTER TABLE
  1491 | Chapel Hill | 35.9131996 | -79.0558445 | 0101000020E6100000325C78B9E3F44140564ACFF492C353C0 | 2010-01-01 02:00:00 | 19.2165870666504 | 0.686179161071777 | 6.17561244964599
     4 | Raleigh     | 35.7795897 | -78.6381787 | 0101000020E610000034E66498C9E341403E6079EBD7A853C0 | 2010-01-01 03:00:00 | 15.6943092346191 | 0.831261157989502 | 7.48135042190552
 (10 rows)
-
 ...
 ALTER TABLE
  id | exposure_type |      description       | units | has_values | has_scores | schema_version
