@@ -38,11 +38,11 @@ class GetPm25ExposureData(GetExposureData):
                 sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
                                   datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
                                   pt[0], pt[1], str(result)])
-
+        session.close()
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
                          'start_time': o[0], 'units': 'ugm3', 'value': o[4]
                          } for o in sql_array])
-        session.close()
+
         return data
 
     def get_scores(self, **kwargs):
@@ -81,11 +81,11 @@ class GetPm25ExposureData(GetExposureData):
                 sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
                                   datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
                                   pt[0], pt[1], str(result)])
-
+        session.close()
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
                          'start_time': o[0], 'units': kwargs.get('score_type'), 'value': o[4]
                          } for o in sql_array])
-        session.close()
+
         return data
 
 # Define valid parameter sets
