@@ -5,7 +5,7 @@ General Exposure Spatial-temporal Exposure Model
 drug exposure measure in order to compare patient subpopulations based
 on drug versus outcome measure (ED visits).
 
-**Dealing with a spatial-temporal exposure model:**^[**1]**^ A patient
+**Dealing with a spatial-temporal exposure model:**<sup>[1]</sup> A patient
 will be on a specific drug for a certain time period [Ts,Te]. During
 that time period, we can consider they spend a portion of their time at
 different locations [L1:D1, L2:D2, ..., LN:DN] where Lx is a location of
@@ -14,10 +14,10 @@ in that location, n = 1…N. For instance, a patient may spend 50% of time
 at work and 50% at home. Ts and Te can be a date or a date and time.
 
 A (socio)environmental exposure estimate for a patient can then be
-computed using the input Exp~est~ = [Ts,Te,L1:D1,L2:D2,...,:LN:DN]
+computed using the input Exp<sub>est</sub> = [Ts,Te,L1:D1,L2:D2,...,:LN:DN]
 
 *Caveat*: This model doesn't explicitly take account of time of day or
-time of year, but Exp~est~ could be readily be expanded to include those
+time of year, but Exp<sub>est</sub> could be readily be expanded to include those
 variables.
 
 *Caveat:* Other comparisons may be made, in addition to drug versus
@@ -33,35 +33,35 @@ driving along a road(s) unless the road is considered a location)
 From several measures, we will want to calculate daily exposure “scores”
 (DES) over the time period [Ts,Te]:
 
-**For example, for PM~2.5~, daily exposure ‘scores’ are:**^[2]^
+**For example, for PM<sub>2.5</sub>, daily exposure ‘scores’ are:**<sup>[2]</sup>
 
-DES~p~1: 24h max PM~2.5~ \< 4.0 μg/m^3^
+DES<sub>p</sub>1: 24h max PM<sub>2.5</sub> \< 4.0 μg/m<sup>3</sup>
 
-DES~p~2: 24h max PM~2.5~ 4.0-7.06 μg/m^3^
+DES<sub>p</sub>2: 24h max PM<sub>2.5</sub> 4.0-7.06 μg/m<sup>3</sup>
 
-DES~p~3: 24h max PM~2.5~ 7.007-8.97 μg/m^3^
+DES<sub>p</sub>3: 24h max PM<sub>2.5</sub> 7.007-8.97 μg/m^3^
 
-DES~p~4: 24h max PM ~2.5~ 8.98-11.36 μg/m^3^
+DES<sub>p</sub>4: 24h max PM <sub>2.5</sub> 8.98-11.36 μg/m<sup>3</sup>
 
-DES~p~5: 24h max PM~2.5~ \> 11.37 μg/m^3^
+DES<sub>p</sub>5: 24h max PM<sub>2.5</sub> \> 11.37 μg/m<sup>3</sup>
 
 From the daily scores, we can then calculate exposure scores for a
 smaller time interval within [Ts,Te].
 
-**For example, for PM~2.5~, we are interested in calculating overall 7-
+**For example, for PM<sub>2.5</sub>, we are interested in calculating overall 7-
 and 14-day DES values:**
 
-DES~7p~ = (DES**~P~**1+DES**~P~**2…DES**~P~**7)/7
+DES<sub>7p</sub> = (DES**<sub>P</sub>**1+DES**<sub>P</sub>**2…DES**<sub>P</sub>**7)/7
 
-DES~14p~ = (DES**~P~**1+DES**~P~**2…DES**~P~**14)/14
+DES<sub>14p</sub> = (DES**<sub>P</sub>**1+DES**<sub>P</sub>**2…DES**<sub>P</sub>**14)/14
 
-*Caveat:* For certain measures (e.g., poverty/non-poverty), the Exp~est~
-measure will be the same as the DES and DES~7~ and DES~14~ values.
+*Caveat:* For certain measures (e.g., poverty/non-poverty), the Exp<sub>est</sub>
+measure will be the same as the DES and DES<sub>7</sub> and DES<sub>14</sub> values.
 
 1: Exposure to Airborne Particulates
 ====================================
 
-**Input:** EXP~est~
+**Input:** EXP<sub>est</sub>
 
 **Output:** categorical exposure score, ranging from 1 (low) to 5 (high)
 
@@ -70,78 +70,78 @@ developed above (and based on [1]), UNC’s CMAS Center has developed
 their own models—CMAQ, R-LINE, C-LINE—which provide more accurate and
 granular exposure measures. In the near-term, we will work with CMAQ
 2010 (36-km resolution) and 2011 (12-km resolution) data on primary and
-secondary PM~2.5~ and secondary ozone exposures. (Note that ozone
+secondary PM<sub>2.5</sub> and secondary ozone exposures. (Note that ozone
 exposures are all secondary.) Eventually, the following exposure
 measures will be made available from the CMAS roadside exposure models,
 either as yearly averages or as hourly values (which require assumed
 conditions on season, time of day, wind direction, atmospheric
 stability, day of week, hour of day).
 
-*\*Note that PM~2.5~ will be the primary (socio)environmental exposure
+\**Note that PM<sub>2.5</sub> will be the primary (socio)environmental exposure
 measure for the Translator Demonstration Use Case because the
-PM~2.5~-asthma linkage is well documented and the other exposures will
-present the same challenges, so PM~2.5~ provides a good stress test of
+PM<sub>2.5</sub>-asthma linkage is well documented and the other exposures will
+present the same challenges, so PM<sub>2.5</sub> provides a good stress test of
 our model and approach.*
 
 Available measurements:
 
--   NO~x~: nitrogen oxides; maximum: 200 ppb
+-   NO<sub>x</sub>: nitrogen oxides; maximum: 200 ppb
 
 -   CO: carbon monoxide; maximum: 10,000 ppb
 
--   SO~x~: sulfur dioxide; maximum: 100 ppb
+-   SO<sub>x</sub>: sulfur dioxide; maximum: 100 ppb
 
--   PM~2.5~: particulate matter with aerodynamic diameter \<2.5 microns;
+-   PM<sub>2.5</sub>: particulate matter with aerodynamic diameter \<2.5 microns;
     maximum: 50 μg/m3
 
--   Diesel-PM~2.5~: PM~2.5~ emissions from diesel vehicles only;
-    maximum: 50 μg/m3
+-   Diesel-PM<sub>2.5</sub>: PM<sub>2.5</sub> emissions from diesel vehicles only;
+    maximum: 50 μg/m<sup>3</sup>
 
--   EC~2.5~: portion of PM~2.5~ consisting of elemental carbon
+-   EC<sub>2.5</sub>: portion of PM<sub>2.5</sub> consisting of elemental carbon
     (graphitic carbon and high molecular weight, nonvolatile organic
-    compounds); maximum: 50 μg/m3
+    compounds); maximum: 50 μg/m<sup>3</sup>
 
--   OC~2.5~: portion of PM~2.5~ consisting of organic carbon
+-   OC<sub>2.5</sub>: portion of PM<sub>2.5</sub> consisting of organic carbon
     (particulate organic compounds containing more than 20 carbon
-    atoms); maximum: 50 μg/m3
+    atoms); maximum: 50 μg/m<sup>3</sup>
 
--   Benzene: maximum: 30 μg/m3
+-   Benzene: maximum: 30 μg/m<sup>3</sup>
 
--   Formaldehyde: maximum: 9.8 μg/m3
+-   Formaldehyde: maximum: 9.8 μg/m<sup>3</sup>
 
--   Acetaldehyde: (systematic name: ethanol); maximum: 9 μg/m3
+-   Acetaldehyde: (systematic name: ethanol); maximum: 9 μg/m<sup>3</sup>
 
--   Acrolein: (systematic name: propenal); maximum: 0.02 μg/m3
+-   Acrolein: (systematic name: propenal); maximum: 0.02 μg/m<sup>3</sup>
 
--   1,3-butadiene: maximum: 2 μg/m3
+-   1,3-butadiene: maximum: 2 μg/m<sup>3</sup>
 
-5.1: Exposure to Airborne Particulates - PM~2.5~
+5.1: Exposure to Airborne Particulates - PM<sub>2.5</sub>
 ------------------------------------------------
 
 Description: models are oriented towards two measures, annual mean and
 daily max.
 
-Approach: stratify exposure as number of days where max PM~2.5~ over all
+Approach: stratify exposure as number of days where max PM<sub>2.5</sub> over all
 locations falls into some category, e.g., low, medium, high. Use cutoffs
 from [2].
 
-**Daily PM~2.5~ exposure ‘score’ (DES~P~):^[2]^**
+**Daily PM<sub>2.5</sub> exposure ‘score’ (DES<sub>P</sub>):<sup>[2]</sup>**
 
-DES~p~1: 24h max PM~2.5~ \< 4.0 μg/m^3^
+DES<sub>p</sub>1: 24h max PM<sub>2.5</sub> \< 4.0 μg/m<sup>3</sup>
 
-DES~p~2: 24h max PM~2.5~ 4.0-7.06 μg/m^3^
+DES<sub>p</sub>2: 24h max PM<sub>2.5</sub> 4.0-7.06 μg/m<sup>3</sup>
 
-DES~p~3: 24h max PM~2.5~ 7.007-8.97 μg/m^3^
+DES<sub>p</sub>3: 24h max PM<sub>2.5</sub> 7.007-8.97 μg/m<sup>3</sup>
 
-DES~p~4: 24h max PM ~2.5~ 8.98-11.36 μg/m^3^
+DES<sub>p</sub>4: 24h max PM <sub>2.5</sub> 8.98-11.36 μg/m<sup>3</sup>
 
-DES~p~5: 24h max PM~2.5~ \> 11.37 μg/m^3^
+DES<sub>p</sub>5: 24h max PM<sub>2.5</sub> \> 11.37 μg/m<sup>3</sup>
 
-**Overall 7- and 14-day PM~2.5~ risk ‘scores’**
+**Overall 7- and 14-day PM<sub>2.5</sub> risk ‘scores’**
 
-DES~7p~ = (DES**~P~**1+DES**~P~**2…DES**~P~**7)/7
+DES<sub>7p</sub> = (DES**<sub>P</sub>**1+DES**<sub>P</sub>**2…DES**<sub>P</sub>**7)/7
 
-DES~14p~ = (DES**~P~**1+DES**~P~**2…DES**~P~**14)/14
+DES<sub>14p</sub> = (DES**<sub>P</sub>**1+DES**<sub>P</sub>**2…DES**<sub>P</sub>**14)/14
 
 *Caveat*: These cutoffs are based solely on [2], and they do not account
 for extreme weather days. The values are much lower than the US EPA AQI
@@ -150,9 +150,9 @@ adults, healthy and non-healthy), are skewed toward extreme weather
 events, and are not as granular as we propose for pediatric patients
 with asthma, who are very sensitive to airborne pollutants. US EPA AQI
 breakpoints: 24-h average: 0-12, 12.1-35.4, 35.5-55.4, 55.5-150.4,
-150.5-250.4, 250.5-350.4, 350.5-500.4 μg/m^3^
-(<https://en.wikipedia.org/wiki/Air_quality_index>)^[3]^. US EPA overall
-guidelines are maximum PM~2.5~: 12.0 μg/m^3^ over 1 year, 35 μg/m^3^
+150.5-250.4, 250.5-350.4, 350.5-500.4 μg/m<sup>3</sup>
+(<https://en.wikipedia.org/wiki/Air_quality_index>)<sup>[3]</sup>. US EPA overall
+guidelines are maximum PM<sub>2.5</sub>: 12.0 μg/m<sup>3</sup> over 1 year, 35 μg/m<sup>3</sup>
 over 24 hours.
 
 *Caveat:* This approach does not account for exposures prior to the Ts
@@ -162,39 +162,39 @@ relatively short (\<1 or 2 weeks).
 2: Exposure to Ozone
 ====================
 
-**Input:** EXP~est~
+**Input:** EXP<sub>est</sub>
 
 **Output:** categorical ozone exposure score
 
-**Daily ozone exposure ‘score’ (DES~o~):**^[3-5]^
+**Daily ozone exposure ‘score’ (DES<sub>o</sub>):**<sup>[3-5]</sup>
 
-DES~o~1: 24h max ozone ≤ 0.050 ppm
+DES<sub>o</sub>1: 24h max ozone ≤ 0.050 ppm
 
-DES~o~2: 24h max ozone 0.051 – 0.075 ppm
+DES<sub>o</sub>2: 24h max ozone 0.051 – 0.075 ppm
 
-DES~o~3: 24h max ozone 0.076-0.100 ppm
+DES<sub>o</sub>3: 24h max ozone 0.076-0.100 ppm
 
-DES~o~4: 24h max ozone 0.101-0.125 ppm
+DES<sub>o</sub>4: 24h max ozone 0.101-0.125 ppm
 
-DES~o~5: 24h max ozone \> 0.125 ppm
+DES<sub>o</sub>5: 24h max ozone \> 0.125 ppm
 
 **Overall 7- and 14-day ozone risk ‘scores’**
 
-DES~7o~ = (DES**~o~**1+DES**~o~**2…DES**~o~**7)/7
+DES<sub>7o</sub> = (DES**<sub>o</sub>**1+DES**<sub>o</sub>**2…DES**<sub>o</sub>**7)/7
 
-DES~14o~ = (DES**~o~**1+DES**~o~**2…DES**~o~**14)/14
+DES<sub>14o</sub> = (DES**<sub>o</sub>**1+DES**<sub>o</sub>**2…DES**<sub>o</sub>**14)/14
 
-*Caveat:* The cutoffs are based on [4], [5], and [6]. As with ~PM2.5~,
+*Caveat:* The cutoffs are based on [4], [5], and [6]. As with <sub>PM2.5</sub>,
 the ozone exposure cutoffs that we propose are lower than the US EPA AQI
 breakpoints US EPA AQI breakpoints: 8-h average: 0-54 ppb, 55-70 ppb,
 71-85 ppm 86-105 ppb, 106-200 ppb; 1-h average: 125-164 ppb, 165-204
 ppb, 205-404 ppb, 405-504 ppb, 505-604 ppb
-<https://en.wikipedia.org/wiki/Air_quality_index>^[3]^.
+<https://en.wikipedia.org/wiki/Air_quality_index><sup>[3]</sup>.
 
 3: Exposure to Crime/Violence
 =============================
 
-**Input:** EXP~est~
+**Input:** EXP<sub>est</sub>
 
 **Output:** categorical crime exposure score
 
@@ -203,15 +203,15 @@ non-negligent manslaughter, forcible rape, robbery, aggravated assault)
 or property crime (burglary, larceny-theft, motor vehicle theft),
 measured at US Census–tract level
 
-**Daily crime exposure ‘score’ (DES~c~):**^[7]^
+**Daily crime exposure ‘score’ (DES<sub>c</sub>):**<sup>[7]</sup>
 
 1 (less crime) – 10 (more crime) relative to national distribution
 
 **Overall 7- and 14-day crime exposure ‘scores’**
 
-DES~7c~ = (DES**~c~**1+DES**~c~**2…DES**~c~**7)/7
+DES<sub>7c</sub> = (DES**<sub>c</sub>**1+DES**<sub>c</sub>**2…DES**<sub>c</sub>**7)/7
 
-DES~14c~ = (DES**~c~**1+DES**~c~**2…DES**~c~**14)/14
+DES<sub>14c</sub> = (DES**<sub>c</sub>**1+DES**<sub>c</sub>**2…DES**<sub>c</sub>**14)/14
 
 *Caveat:* The cutoffs in [7] are based on proprietary models. We will
 need to identify appropriate cutoffs, perhaps by examining the overall
@@ -221,7 +221,7 @@ statistically generating appropriate cutoffs.
 4: Exposure to Rural versus Urban Environment
 =============================================
 
-**Input:** EXP~est~
+**Input:** EXP<sub>est</sub>
 
 **Output:** category, either urban or rural
 
@@ -235,7 +235,7 @@ rural)
 5: Exposure to Poverty
 ======================
 
-**Input:** EXP~est~, income [optional], age [optional], \# people in
+**Input:** EXP<sub>est</sub>, income [optional], age [optional], \# people in
 family [optional]
 
 **Output:** category, either below poverty or not
@@ -265,7 +265,7 @@ Poverty:
 6: Exposure to Low Household SES
 ================================
 
-**Input:** EXP~est~
+**Input:** EXP<sub>est</sub>
 
 **Output:** category, one of four values below
 
@@ -276,7 +276,7 @@ category (e.g., 1 month as high SES, 11 months as low SES =\> use low
 SES)
 
 Categorize SES based on the percentage of US Census-tract population
-living below the poverty line for that year.^[8]^
+living below the poverty line for that year.<sup>[8]</sup>
 
 high SES (0%–4.9%)
 
@@ -340,12 +340,12 @@ Important notes:
     (heavy duty diesel, light duty gas, …).
 
 [2] Mirabelli MC, Vaidyanathan A, Flanders WD, Qin X, Garbe P. Outdoor
-PM~2.5~, ambient air temperature, and asthma symptoms in the past 14
+PM<sub>2.5</sub>, ambient air temperature, and asthma symptoms in the past 14
 days among adults with active asthma. *Environ Health Perspect*
 2016;124(12):1882–1890. <https://www.ncbi.nlm.nih.gov/pubmed/27385358>.
 
 [3] US EPA AQI breakpoints
-<https://en.wikipedia.org/wiki/Air_quality_index>^[3]^.
+<https://en.wikipedia.org/wiki/Air_quality_index><sup>[3]</sup>.
 
 [4] White MC, Etzel RA, Wilcox WD, Lloyd C. Exacerbations of childhood
 asthma and ozone pollution in Atlanta. *Environ Res.* 1994;65:56–68.
