@@ -1,4 +1,12 @@
-# pm25 Risk Score Calculation
+# Particulate Matter 2.5 (pm25) query documentation
+
+Description:
+
+## pm25 Value Calculation
+
+TODO:
+
+## pm25 Risk Score Calculation
 
 ### Spatio-temporal Exposure model:
 
