@@ -13,7 +13,7 @@ Exposures query [definitions](https://github.com/mjstealey/datatranslator/tree/d
 
 Avaialble clients:
 
-- Python client: [in progress](https://github.com/mjstealey/datatranslator/tree/20-python-client/python-client)
+- [Python client](https://github.com/mjstealey/datatranslator/tree/develop/python-client)
 
 ## Development Environment
 
@@ -25,6 +25,7 @@ Local development for datatranslator implemented in docker
 - **python-flask-server**: connexion w/ gevent server
     - `datatranslator/python-flask-server/requirements.txt` in develop branch
     - [![Requirements Status](https://requires.io/github/mjstealey/datatranslator/requirements.svg?branch=develop)](https://requires.io/github/mjstealey/datatranslator/requirements/?branch=develop) 
+- **python-client**: stand alone [python-client](https://github.com/mjstealey/datatranslator/tree/develop/python-client)
 
 ---
 
