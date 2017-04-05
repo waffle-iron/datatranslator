@@ -16,6 +16,14 @@ engine = create_engine(POSTGRES_ENGINE)
 Session = sessionmaker(bind=engine)
 
 
+def exposures_exposure_type_coordinates_get(exposureType, latitude = None, longitude = None, radius = None) -> str:
+    return 'do some magic!'
+
+
+def exposures_exposure_type_dates_get(exposureType) -> str:
+    return 'do some magic!'
+
+
 def exposures_exposure_type_scores_get(exposure_type, start_date, end_date, exposure_point, \
                                        temporal_resolution=None, score_type=None) -> str:
     session = Session()
