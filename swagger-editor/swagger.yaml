@@ -1,277 +1,283 @@
----
+# Data Translator Environmental Exposure API
+#
+# This API provides access to environmental exposures. An exposure is
+# any factor outside a human body that can act upon the body to cause
+# a health impact, including chemical entities, biological entities,
+# physical factors (e.g., sunlight, temperature), and social environmental 
+# factors (e.g., crime-induced stress, poverty). 
+#
+# Exposures are parameterized by a range of temporal and spatial
+#  factors that determine where a human has been and thus what factors they
+#  were exposured to.
+#
+# Exposures are typically quantified at several levels:
+#   - raw value: a measured quantity for the exposure factor typically taken
+#       from an environmental sensor or other primary data collection method.
+#   - exposure value: a quantity derived from raw values that computes a 
+#       a net exposure to the factor for a range of spatial and temporal 
+#       coordinates. This value is often the result of interpolating raw values
+#       to cover all relevant spatial temporal coordinates. Values may also
+#       combine different raw value sources, such as primary and secondary 
+#       measures of air particulates. Requests for exposure values may
+#       require indicating the computational method and parameters. 
+#   - exposure score: a quantity derived from exposure and/or raw values that
+#       relates the exposure value to a risk score for a particular disease. Thus
+#       an exposure score for asthma may be different than a score for alzheimers
+#       despite being based on the same exposure values.
+
+
 swagger: "2.0"
 info:
-  description: "Environmental Exposures API"
-  version: "v1"
+  version: "1.0.0"
   title: "Environmental Exposures API"
-host: "localhost:8080"
-basePath: "/v1"
+  description: "Environmental Exposures API"
+  contact:
+    url: "http://renci.org"
+    name: "Michael J. Stealey"
+    email: "stealey@renci.org"
+host: exposures.renci.org
+basePath: /v1
 schemes:
-- "https"
-- "http"
+ - https
+ - http
+
 paths:
   /exposures:
     get:
-      tags:
-      - "default"
       summary: "Get list of exposure types"
       description: "Returns a list of all available exposure types"
-      operationId: "controllers.default_controller.exposures_get"
       produces:
-      - "application/json"
-      parameters: []
+        - application/json
       responses:
         200:
           description: "Exposure types"
           schema:
-            type: "array"
+            type: array
             items:
-              $ref: "#/definitions/exposure_type"
+              $ref: '#/definitions/exposure_type'
         404:
           description: "No exposure types found"
+          
   /exposures/{exposure_type}/values:
+    parameters:
+      - $ref: '#/parameters/exposure_type'
     get:
-      tags:
-      - "default"
       summary: "Get exposure value for a given environmental factor"
-      description: "Retrieve the computed exposure value for a given environmental\
-        \ exposure factor, time period, and set of locations"
-      operationId: "controllers.default_controller.exposures_exposure_type_values_get"
+      description: "Retrieve the computed exposure value for a given environmental exposure factor, time period, and set of locations"
       produces:
-      - "application/json"
+        - application/json
       parameters:
-      - name: "exposure_type"
-        in: "path"
-        description: "The name of the exposure factor (currently limited to pm25,\
-          \ ozone)."
-        required: true
-        type: "string"
-      - name: "start_date"
-        in: "query"
-        description: "The starting date to obtain exposures for (example 1985-04-12\
-          \ is April 12th 1985). Currently time of day is ignored."
-        required: true
-        type: "string"
-        format: "date"
-      - name: "end_date"
-        in: "query"
-        description: "The ending date to obtain exposures for (example 1985-04-13\
-          \ is April 13th 1985). Currently time of day is ignored."
-        required: true
-        type: "string"
-        format: "date"
-      - name: "exposure_point"
-        in: "query"
-        description: "A description of the location(s) to retrieve the exposure for.\
-          \ Locaton may be a single geocoordinate (example '35.720278,-79.176389')\
-          \ or a semicomma separated list of geocoord:dayhours giving the start and\
-          \ ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other')\
-          \ indicates Saturdays from 8am to 1pm is at one location and all other times\
-          \ are at another location. Hours should be in 24 hours time using 2 digits,\
-          \ days of the week should be the first two characters of the day.If the\
-          \ day of the week does not appear then the time periods apply to all days\
-          \ (example '35.720278,-79.176389,0614,35.731944,-78.852778,1424') gives\
-          \ two time periods for all days. If hours do not appear then the time period\
-          \ applies to all hours of the day (example '35.720278,-79.176389,Sa,35.731944,-78.852778,Su')."
-        required: true
-        type: "string"
-      - name: "temporal_resolution"
-        in: "query"
-        description: "The temporal resolution to use for results, should be one of\
-          \ 'hour' or 'day'. Default is 'day'"
-        required: false
-        type: "string"
-        default: "day"
-      - name: "statistical_type"
-        in: "query"
-        description: "The statistic to use for results, should be one of 'max', 'mean',\
-          \ or 'median'. Default is 'max'"
-        required: false
-        type: "string"
-        default: "max"
+        - $ref: '#/parameters/start_date'
+        - $ref: '#/parameters/end_date'
+        - $ref: '#/parameters/exposure_point'
+        - $ref: '#/parameters/temporal_resolution'
+        - $ref: '#/parameters/statistical_type'
       responses:
         200:
-          description: "OK"
+          description: OK
           schema:
-            type: "array"
+            type: array
             items:
-              $ref: "#/definitions/exposure"
+              $ref: '#/definitions/exposure'
         400:
           description: "Invalid exposure parameter"
         404:
           description: "Values not found for exposure type"
+          
   /exposures/{exposure_type}/scores:
+    parameters:
+      - $ref: '#/parameters/exposure_type'
     get:
-      tags:
-      - "default"
       summary: "Get exposure score for a given environmental factor"
-      description: "Retrieve the computed exposure score for a given environmental\
-        \ exposure factor, time period, and set of locations"
-      operationId: "controllers.default_controller.exposures_exposure_type_scores_get"
+      description: "Retrieve the computed exposure score for a given environmental exposure factor, time period, and set of locations"
       produces:
-      - "application/json"
+        - application/json
       parameters:
-      - name: "exposure_type"
-        in: "path"
-        description: "The name of the exposure factor (currently limited to pm25,\
-          \ ozone)."
-        required: true
-        type: "string"
-      - name: "start_date"
-        in: "query"
-        description: "The starting date to obtain exposures for (example 1985-04-12\
-          \ is April 12th 1985). Currently time of day is ignored."
-        required: true
-        type: "string"
-        format: "date"
-      - name: "end_date"
-        in: "query"
-        description: "The ending date to obtain exposures for (example 1985-04-13\
-          \ is April 13th 1985). Currently time of day is ignored."
-        required: true
-        type: "string"
-        format: "date"
-      - name: "exposure_point"
-        in: "query"
-        description: "A description of the location(s) to retrieve the exposure for.\
-          \ Locaton may be a single geocoordinate (example '35.720278,-79.176389')\
-          \ or a semicomma separated list of geocoord:dayhours giving the start and\
-          \ ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other')\
-          \ indicates Saturdays from 8am to 1pm is at one location and all other times\
-          \ are at another location. Hours should be in 24 hours time using 2 digits,\
-          \ days of the week should be the first two characters of the day.If the\
-          \ day of the week does not appear then the time periods apply to all days\
-          \ (example '35.720278,-79.176389,0614,35.731944,-78.852778,1424') gives\
-          \ two time periods for all days. If hours do not appear then the time period\
-          \ applies to all hours of the day (example '35.720278,-79.176389,Sa,35.731944,-78.852778,Su')."
-        required: true
-        type: "string"
-      - name: "temporal_resolution"
-        in: "query"
-        description: "The temporal resolution to use for results, should be one of\
-          \ 'hour' or 'day'. Default is 'day'"
-        required: false
-        type: "string"
-        default: "day"
-      - name: "score_type"
-        in: "query"
-        description: "The exposure score type to return. The accepted values vary\
-          \ by exposure factor. For pm25 values are '7dayrisk', '14dayrisk' (NOT COMPLETE)"
-        required: false
-        type: "string"
-        default: "7dayrisk"
+        - $ref: '#/parameters/start_date'
+        - $ref: '#/parameters/end_date'
+        - $ref: '#/parameters/exposure_point'
+        - $ref: '#/parameters/temporal_resolution'
+        - $ref: '#/parameters/score_type'
       responses:
         200:
-          description: "OK"
+          description: OK
           schema:
-            type: "array"
+            type: array
             items:
-              $ref: "#/definitions/exposure"
+              $ref: '#/definitions/exposure'
         400:
           description: "Invalid exposure parameters"
         404:
           description: "Scores not found for exposure type"
+          
+  /exposures/{exposure_type}/coordinates:
+    parameters:
+      - $ref: '#/parameters/exposure_type'
+    get:
+      summary: "Get list of exposure types"
+      description: "Returns paginated list of available coordinates for given exposure_type"
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/latitude'
+        - $ref: '#/parameters/longitude'
+      responses:
+        200:
+          description: "Exposure points"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/coordinate'
+        404:
+          description: "No coordinates found for exposure type"
+          
+  /exposures/{exposure_type}/dates:
+    parameters:
+      - $ref: '#/parameters/exposure_type'
+    get:
+      summary: "Get date range for exposure type"
+      description: "Returns range of available dates for given exposure_type"
+      produces:
+        - application/json
+      responses:
+        200:
+          description: "Date range"
+          schema:
+            $ref: '#/definitions/date_range'
+        404:
+          description: "No date range found for exposure type"
+    
+    
+
 definitions:
   exposure:
-    type: "object"
+    type: object
     required:
-    - "exposure_type"
+      - exposure_type
     properties:
       exposure_type:
-        type: "string"
+        type: string
       start_time:
-        type: "string"
-        format: "date-time"
+        type: string
+        format: date-time
       end_time:
-        type: "string"
-        format: "date-time"
+        type: string
+        format: date-time
       value:
-        type: "string"
+        type: string
       units:
-        type: "string"
+        type: string
       latitude:
-        type: "string"
-        format: "double"
+        type: string
+        format: float
       longitude:
-        type: "string"
-        format: "double"
+        type: string
+        format: float
+      
   exposure_type:
-    type: "object"
+    type: object
     properties:
       exposure_type:
-        type: "string"
+        type: string
       description:
-        type: "string"
+        type: string
       units:
-        type: "string"
+        type: string
       has_values:
-        type: "string"
-        format: "boolean"
+        type: string
+        format: boolean
       has_scores:
-        type: "string"
-        format: "boolean"
+        type: string
+        format: boolean
       schema_version:
-        type: "string"
+        type: string
+        
+  coordinate:
+    type: object
+    properties:
+      latitude:
+        type: string
+        format: float
+      longitude:
+        type: string
+        format: float
+        
+  date_range:
+    type: object
+    properties:
+      start_date:
+        type: string
+        format: date-time
+      end_date:
+        type: string
+        format: date-time
+    
+
 parameters:
   exposure_type:
-    name: "exposure_type"
-    in: "path"
-    description: "The name of the exposure factor (currently limited to pm25, ozone)."
+    name: exposure_type
+    in: path
     required: true
-    type: "string"
+    description: "The name of the exposure factor (currently limited to pm25, o3)."
+    type: string
+    
   start_date:
-    name: "start_date"
-    in: "query"
-    description: "The starting date to obtain exposures for (example 1985-04-12 is\
-      \ April 12th 1985). Currently time of day is ignored."
+    name: start_date
+    in: query
     required: true
-    type: "string"
-    format: "date"
+    description: "The starting date to obtain exposures for (example 1985-04-12 is April 12th 1985). Currently time of day is ignored."
+    type: string
+    format: date
+    
   end_date:
-    name: "end_date"
-    in: "query"
-    description: "The ending date to obtain exposures for (example 1985-04-13 is April\
-      \ 13th 1985). Currently time of day is ignored."
+    name: end_date
+    in: query
     required: true
-    type: "string"
-    format: "date"
+    description: "The ending date to obtain exposures for (example 1985-04-13 is April 13th 1985). Currently time of day is ignored."
+    type: string
+    format: date
+    
   temporal_resolution:
-    name: "temporal_resolution"
-    in: "query"
-    description: "The temporal resolution to use for results, should be one of 'hour'\
-      \ or 'day'. Default is 'day'"
+    name: temporal_resolution
+    in: query
     required: false
-    type: "string"
-    default: "day"
+    description: "The temporal resolution to use for results, should be one of 'hour' or 'day'. Default is 'day'"
+    type: string
+    default: 'day'
+    
   score_type:
-    name: "score_type"
-    in: "query"
-    description: "The exposure score type to return. The accepted values vary by exposure\
-      \ factor. For pm25 values are '7dayrisk', '14dayrisk' (NOT COMPLETE)"
+    name: score_type
+    in: query
     required: false
-    type: "string"
-    default: "7dayrisk"
+    description: "The exposure score type to return. The accepted values vary by exposure factor. For pm25 values are '7dayrisk', '14dayrisk' (NOT COMPLETE)"
+    type: string
+    default: '7dayrisk'
+    
   statistical_type:
-    name: "statistical_type"
-    in: "query"
-    description: "The statistic to use for results, should be one of 'max', 'mean',\
-      \ or 'median'. Default is 'max'"
+    name: statistical_type
+    in: query
     required: false
-    type: "string"
-    default: "max"
+    description: "The statistic to use for results, should be one of 'max', 'mean', or 'median'. Default is 'max'"
+    type: string
+    default: 'max'
+    
   exposure_point:
-    name: "exposure_point"
-    in: "query"
-    description: "A description of the location(s) to retrieve the exposure for. Locaton\
-      \ may be a single geocoordinate (example '35.720278,-79.176389') or a semicomma\
-      \ separated list of geocoord:dayhours giving the start and ending hours on specific\
-      \ days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other')\
-      \ indicates Saturdays from 8am to 1pm is at one location and all other times\
-      \ are at another location. Hours should be in 24 hours time using 2 digits,\
-      \ days of the week should be the first two characters of the day.If the day\
-      \ of the week does not appear then the time periods apply to all days (example\
-      \ '35.720278,-79.176389,0614,35.731944,-78.852778,1424') gives two time periods\
-      \ for all days. If hours do not appear then the time period applies to all hours\
-      \ of the day (example '35.720278,-79.176389,Sa,35.731944,-78.852778,Su')."
+    name: exposure_point
+    in: query
     required: true
-    type: "string"
+    description: "A description of the location(s) to retrieve the exposure for. Locaton may be a single geocoordinate (example '35.720278,-79.176389') or a semicomma separated list of geocoord:dayhours giving the start and ending hours on specific days of the week at that location (example '35.720278,-79.176389,Sa0813;35.720278,-79.176389,other') indicates Saturdays from 8am to 1pm is at one location and all other times are at another location. Hours should be in 24 hours time using 2 digits, days of the week should be the first two characters of the day.If the day of the week does not appear then the time periods apply to all days (example '35.720278,-79.176389,0614,35.731944,-78.852778,1424') gives two time periods for all days. If hours do not appear then the time period applies to all hours of the day (example '35.720278,-79.176389,Sa,35.731944,-78.852778,Su')."
+    type: string
+    
+  latitude:
+    name: latitude
+    in: query
+    required: false
+    description: "Search coordinates for that match or are like 'latitude'"
+    type: string
+    
+  longitude:
+    name: longitude
+    in: query
+    required: false
+    description: "Search coordinates for that match or are like 'longitude'"
+    type: string
