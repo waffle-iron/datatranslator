@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, date, timedelta
 from configparser import ConfigParser
+from flask import jsonify
 import sys
 
 parser = ConfigParser()
@@ -16,29 +17,50 @@ Session = sessionmaker(bind=engine)
 
 class GetExposureData(object):
 
-    def is_before_date_range(self, *args):
+    def min_date(self, *args):
         session = Session()
         date_table = args[0]
         date_column = args[1]
-        date_to_compare = datetime.strptime(args[2], '%Y-%m-%d')
         sql = ('select min(' + date_column + ') from ' + date_table + ';')
         min_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
         min_date = datetime.strptime(min_date, '%Y-%m-%d')
+        return min_date
+
+    def max_date(self, *args):
+        session = Session()
+        date_table = args[0]
+        date_column = args[1]
+        sql = ('select max(' + date_column + ') from ' + date_table + ';')
+        max_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
+        max_date = datetime.strptime(max_date, '%Y-%m-%d')
         session.close()
+        return max_date
+
+    def is_before_date_range(self, *args):
+        # session = Session()
+        # date_table = args[0]
+        # date_column = args[1]
+        date_to_compare = datetime.strptime(args[2], '%Y-%m-%d')
+        # sql = ('select min(' + date_column + ') from ' + date_table + ';')
+        # min_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
+        # min_date = datetime.strptime(min_date, '%Y-%m-%d')
+        min_date = self.min_date(*args)
+        # session.close()
         if min_date > date_to_compare:
             return True
 
         return False
 
     def is_after_date_range(self, *args):
-        session = Session()
-        date_table = args[0]
-        date_column = args[1]
+        # session = Session()
+        # date_table = args[0]
+        # date_column = args[1]
         date_to_compare = datetime.strptime(args[2], '%Y-%m-%d')
-        sql = ('select max(' + date_column + ') from ' + date_table + ';')
-        max_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
-        max_date = datetime.strptime(max_date, '%Y-%m-%d')
-        session.close()
+        # sql = ('select max(' + date_column + ') from ' + date_table + ';')
+        # max_date = datetime.strftime(session.execute(sql).scalar(), '%Y-%m-%d')
+        # max_date = datetime.strptime(max_date, '%Y-%m-%d')
+        # session.close()
+        max_date = self.max_date(*args)
         if max_date < date_to_compare:
             return True
 
@@ -96,6 +118,12 @@ class GetExposureData(object):
     def get_date_list(self, **kwargs):
         date_list = ([datetime.strftime(datetime.strptime(kwargs.get('start_date'), '%Y-%m-%d').date() + timedelta(days=i), '%Y-%m-%d')] for i in range(((datetime.strptime(kwargs.get('end_date'), '%Y-%m-%d')) - (datetime.strptime(kwargs.get('start_date'), '%Y-%m-%d'))).days + 1))
         return date_list
+
+    def get_coordinates(self, **kwargs):
+        raise NotImplemented
+
+    def get_dates(self, **kwargs):
+        raise NotImplemented
 
     def get_values(self, **kwargs):
         raise NotImplemented

@@ -95,6 +95,20 @@ statistical_type_set = {'max', 'mean', 'median'}
 
 exp = GetPm25ExposureData()
 
+def get_coordinates(**kwargs):
+    session = Session()
+    sql = "select distinct latitude, longitude from cmaq order by latitude;"
+    results = session.execute(sql)
+    session.close()
+    data = jsonify([dict(latitude=str(o.latitude), longitude=str(o.longitude))
+                    for o in results])
+    return data
+
+def get_dates(**kwargs):
+    min_date = exp.min_date('Cmaq', 'utc_date_time')
+    max_date = exp.max_date('Cmaq', 'utc_date_time')
+    data = jsonify({'start_date': min_date, 'end_date': max_date})
+    return data
 
 def get_values(**kwargs):
     # print(kwargs)
