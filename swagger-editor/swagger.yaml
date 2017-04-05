@@ -184,11 +184,9 @@ definitions:
       units:
         type: string
       has_values:
-        type: string
-        format: boolean
+        type: boolean
       has_scores:
-        type: string
-        format: boolean
+        type: boolean
       schema_version:
         type: string
         
