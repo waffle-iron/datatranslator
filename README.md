@@ -1,6 +1,19 @@
-# Environmental Exposure API
+# Environmental Exposures API
 
-Example at: [bdtgis.renci.org](http://bdtgis.renci.org:9090/v1/ui/#/default)
+### TL;DR
+
+Exposures API at: [exposures.renci.org](https://exposures.renci.org/v1/ui/#/default)
+
+Swagger definition for [Environmental Exposures API](https://app.swaggerhub.com/api/mjstealey/environmental_exposures_api/1.0.0)
+
+- Linked to Github [swagger-editor/swagger.yaml](https://github.com/mjstealey/datatranslator/blob/develop/swagger-editor/swagger.yaml)
+- Adheres to smartAPI [specification](https://websmartapi.github.io/smartapi_specification/)
+
+Exposures query [definitions](https://github.com/mjstealey/datatranslator/tree/develop/python-flask-server/exposures/docs)
+
+Avaialble clients:
+
+- Python client: [in progress](https://github.com/mjstealey/datatranslator/tree/20-python-client/python-client)
 
 ## Development Environment
 
