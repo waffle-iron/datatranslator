@@ -24,18 +24,30 @@
 
 from __future__ import absolute_import
 
-# import models into sdk package
-from .models.coordinate import Coordinate
-from .models.date_range import DateRange
-from .models.exposure import Exposure
-from .models.exposure_type import ExposureType
+import os
+import sys
+import unittest
 
-# import apis into sdk package
-from .apis.default_api import DefaultApi
+import swagger_client
+from swagger_client.rest import ApiException
+from swagger_client.models.coordinate import Coordinate
 
-# import ApiClient
-from .api_client import ApiClient
 
-from .configuration import Configuration
+class TestCoordinate(unittest.TestCase):
+    """ Coordinate unit test stubs """
 
-configuration = Configuration()
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testCoordinate(self):
+        """
+        Test Coordinate
+        """
+        model = swagger_client.models.coordinate.Coordinate()
+
+
+if __name__ == '__main__':
+    unittest.main()
