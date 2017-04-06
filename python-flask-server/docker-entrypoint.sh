@@ -1,15 +1,47 @@
 #!/usr/bin/env bash
 
-if [[ "$1" = 'api' ]]; then
-    # update connexion.ini file
-    cp ini/connexion-template.ini ini/connexion.ini
+_set_connection_ini() {
+    > ini/connexion.ini
+    echo "[connexion]" >> ini/connexion.ini
+    if [[ -z ${CONNEXION_SERVER} ]]; then
+        echo "server = " >> ini/connexion.ini
+    else
+        echo "server = "${CONNEXION_SERVER} >> ini/connexion.ini
+    fi
+    echo "debug = "${CONNEXION_DEBUG} >> ini/connexion.ini
+    echo "port = "${API_SERVER_PORT} >> ini/connexion.ini
+    if [[ -z ${API_SERVER_KEYFILE} ]]; then
+        echo "keyfile = " >> ini/connexion.ini
+    else
+        echo "keyfile = "${API_SERVER_KEYFILE} >> ini/connexion.ini
+    fi
+    if [[ -z ${API_SERVER_CERTFILE} ]]; then
+        echo "certfile = ">> ini/connexion.ini
+    else
+        echo "certfile = "${API_SERVER_CERTFILE} >> ini/connexion.ini
+    fi
+    echo "" >> ini/connexion.ini
+    echo "[sys-path]" >> ini/connexion.ini
+    echo "exposures = "${SYS_PATH_EXPOSURES} >> ini/connexion.ini
+    echo "" >> ini/connexion.ini
+    echo "[postgres]" >> ini/connexion.ini
+    echo "host = "${POSTGRES_HOST} >> ini/connexion.ini
+    echo "port = "${POSTGRES_PORT} >> ini/connexion.ini
+    echo "database = "${POSTGRES_DATABASE} >> ini/connexion.ini
+    echo "username = "${POSTGRES_USERNAME} >> ini/connexion.ini
+    echo "password = "${POSTGRES_PASSWORD} >> ini/connexion.ini
+}
+
+if [[ "$1" = 'app.py' ]]; then
+    # set connexion.ini file
+    _set_connection_ini
 
     # update swagger.yaml file
-    sed -i 's/host.*/host: \"'${API_SERVER_HOST}':'${API_SERVER_PORT}'\"/g' /datatranslator/swagger/swagger.yaml
+    sed -i 's/host.*/host: \"'${API_SERVER_HOST}':'${API_SERVER_PORT}'\"/g' /exposures-api/swagger/swagger.yaml
 
-    # update /etc/hosts if BACKEND_IP is passed in
-    if [[ -n $POSTGRES_BACKEND_IP ]]; then
-        echo "${POSTGRES_BACKEND_IP} backend" >> /etc/hosts
+    # update /etc/hosts if POSTGRES_IP is passed in
+    if [[ -n $POSTGRES_IP ]]; then
+        echo "${POSTGRES_IP} ${POSTGRES_HOST}" >> /etc/hosts
     fi
 
     # run the app
