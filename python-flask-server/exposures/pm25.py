@@ -17,6 +17,32 @@ Session = sessionmaker(bind=engine)
 
 class GetPm25ExposureData(GetExposureData):
 
+    # this might move up to parent class if it is generic for all
+    def create_values_query(self, dt, pt, radius, stat_type, temp_res):
+        if stat_type == "max":
+            sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
+                  "from cmaq " \
+                  "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) and " \
+                                                                         "ST_DWithin(ST_GeographyFromText(" \
+                                                                         "'POINT(" + pt[1] + " " + pt[0] + ")'),"  \
+                                                                         "location," + radius + ");"
+        elif stat_type == "median":
+#           sql = "select @Median = percentile_cont(0.5) within group (order by (pm25_primary + pm25_secondary) " \
+            sql = "select percentile_cont(0.5) within group (order by (pm25_primary + pm25_secondary)) over () " \
+                   "from cmaq " \
+                   "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) and " \
+                                                                          "ST_DWithin(ST_GeographyFromText(" \
+                                                                          "'POINT(" + pt[1] + " " + pt[0] + ")'), " \
+                                                                          "location, " + radius + ");"
+        elif stat_type == "mean":
+            sql = "select avg(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
+                  "from cmaq " \
+                   "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) and " \
+                                                                          "ST_DWithin(ST_GeographyFromText(" \
+                                                                          "'POINT(" + pt[1] + " " + pt[0] + ")'), " \
+                                                                          "location, " + radius + ");"
+        return sql
+
     def get_values(self, **kwargs):
         # print(kwargs)
         # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
@@ -26,18 +52,28 @@ class GetPm25ExposureData(GetExposureData):
         if not valid_points:
             return message
         date_list = GetExposureData.get_date_list(self, **kwargs)
+
+        # radius used to give some leeway to finding the specified lat lon
+        radius_meters = "2"
+        # retrieve the temporal resolution and the statistical type
+        tres = kwargs.get('temporal_resolution')
+        stype = kwargs.get('statistical_type')
+
         sql_array = []
-        for dt in date_list:
-            for pt in point_list:
-                sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) from cmaq " \
-                      "where cast(utc_date_time as date) = cast('" + \
-                      dt[0] + "' as date) and latitude = " + pt[0] + " and longitude = " + pt[1] + ";"
-                result = session.execute(sql).scalar()
-                if not result:
-                    result = 'Not Available'
-                sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
-                                  datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
-                                  pt[0], pt[1], str(result)])
+        if tres == "day":
+            for dt in date_list:
+                for pt in point_list:
+                    sql = self.create_values_query(dt, pt, radius_meters, stype, tres)
+                    result = session.execute(sql).scalar()
+                    if not result:
+                            result = 'Not Available'
+                    sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
+                            datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
+                            pt[0], pt[1], str(result)])
+        elif tres == "hour":
+            # not sure how this will work yet
+            x=0
+
         session.close()
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
                          'start_time': o[0], 'units': 'ugm3', 'value': o[4]
