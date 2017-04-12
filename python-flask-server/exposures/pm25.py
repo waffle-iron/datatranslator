@@ -21,23 +21,32 @@ class GetPm25ExposureData(GetExposureData):
     def create_values_query(self, dt, pt, radius, stat_type, temp_res):
 
         date_loc_where = "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) " \
-                         "and ST_DWithin(ST_GeographyFromText('POINT(" + pt[1] + " " + pt[0] + ")'),"  \
-                                                                "location," + radius + ")"
-        if stat_type == "max":
-            sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
-                  "from cmaq " + \
-                  date_loc_where
+                            "and ST_DWithin(ST_GeographyFromText('POINT(" + \
+                            pt[1] + " " + pt[0] + ")'),location," + radius + ")"
 
-        elif stat_type == "median":
-            sql = "with date_loc_query as (select (coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
-                  "as pm25_total " \
+        if temp_res == "hour":
+            # for hourly - ignore temporal resolution and just return all hours
+            sql = "select utc_date_time, coalesce(pm25_primary,0) + coalesce(pm25_secondary,0) as pm25_total " \
                   "from cmaq " + \
-                  date_loc_where + ") select percentile_cont(0.5) within group(order by pm25_total) from date_loc_query"
+                date_loc_where
 
-        elif stat_type == "mean":
-            sql = "select avg(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
-                  "from cmaq " + \
-                  date_loc_where
+        else:  # assume default - temp_res == "day":
+            if stat_type == "max":
+                sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
+                     "from cmaq " + \
+                    date_loc_where
+
+            elif stat_type == "median":
+                sql = "with date_loc_query as (select (coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
+                     "as pm25_total " \
+                    "from cmaq " + \
+                    date_loc_where + ") select percentile_cont(0.5) within group(order by pm25_total) from date_loc_query"
+
+            elif stat_type == "mean":
+                sql = "select avg(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
+                    "from cmaq " + \
+                    date_loc_where
+
         return sql
 
     def get_values(self, **kwargs):
@@ -57,19 +66,27 @@ class GetPm25ExposureData(GetExposureData):
         stype = kwargs.get('statistical_type')
 
         sql_array = []
-        if tres == "day":
-            for dt in date_list:
-                for pt in point_list:
-                    sql = self.create_values_query(dt, pt, radius_meters, stype, tres)
+
+        for dt in date_list:
+            for pt in point_list:
+                sql = self.create_values_query(dt, pt, radius_meters, stype, tres)
+
+                if tres == "hour":
+                    result = session.execute(sql)
+                else:
                     result = session.execute(sql).scalar()
-                    if not result:
-                            result = 'Not Available'
+
+                if not result:
+                    result = 'Not Available'
+
+                if tres == "hour":
+                 for row in result:
+                    sql_array.append([row['utc_date_time'], row['utc_date_time'],
+                                    pt[0], pt[1], str(row['pm25_total'])])
+                else:
                     sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
-                            datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
-                            pt[0], pt[1], str(result)])
-        elif tres == "hour":
-            # not sure how this will work yet
-            x=0
+                                    datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
+                                    pt[0], pt[1], str(result)])
 
         session.close()
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
