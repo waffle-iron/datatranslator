@@ -28,13 +28,16 @@
 
 swagger: "2.0"
 info:
-  version: "1.0.0"
   title: "Environmental Exposures API"
-  description: "Environmental Exposures API"
+  version: "1.0.0"
   contact:
-    url: "http://renci.org"
     name: "Michael J. Stealey"
     email: "stealey@renci.org"
+    url: "http://renci.org"
+    #responsibleDeveloper: "Michael J. Stealey"
+    #responsibleOrganization: "RENCI"
+  description: "API for environmental exposure models for NIH Data Translator program"
+  termsOfService: "None Available"
 host: exposures.renci.org
 basePath: /v1
 schemes:
