@@ -19,28 +19,25 @@ class GetPm25ExposureData(GetExposureData):
 
     # this might move up to parent class if it is generic for all
     def create_values_query(self, dt, pt, radius, stat_type, temp_res):
+
+        date_loc_where = "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) " \
+                         "and ST_DWithin(ST_GeographyFromText('POINT(" + pt[1] + " " + pt[0] + ")'),"  \
+                                                                "location," + radius + ")"
         if stat_type == "max":
             sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
-                  "from cmaq " \
-                  "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) and " \
-                                                                         "ST_DWithin(ST_GeographyFromText(" \
-                                                                         "'POINT(" + pt[1] + " " + pt[0] + ")'),"  \
-                                                                         "location," + radius + ");"
+                  "from cmaq " + \
+                  date_loc_where
+
         elif stat_type == "median":
-#           sql = "select @Median = percentile_cont(0.5) within group (order by (pm25_primary + pm25_secondary) " \
-            sql = "select percentile_cont(0.5) within group (order by (pm25_primary + pm25_secondary)) over () " \
-                   "from cmaq " \
-                   "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) and " \
-                                                                          "ST_DWithin(ST_GeographyFromText(" \
-                                                                          "'POINT(" + pt[1] + " " + pt[0] + ")'), " \
-                                                                          "location, " + radius + ");"
+            sql = "with date_loc_query as (select (coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
+                  "as pm25_total " \
+                  "from cmaq " + \
+                  date_loc_where + ") select percentile_cont(0.5) within group(order by pm25_total) from date_loc_query"
+
         elif stat_type == "mean":
             sql = "select avg(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) " \
-                  "from cmaq " \
-                   "where cast(utc_date_time as date) = cast('" + dt[0] + "' as date) and " \
-                                                                          "ST_DWithin(ST_GeographyFromText(" \
-                                                                          "'POINT(" + pt[1] + " " + pt[0] + ")'), " \
-                                                                          "location, " + radius + ");"
+                  "from cmaq " + \
+                  date_loc_where
         return sql
 
     def get_values(self, **kwargs):
