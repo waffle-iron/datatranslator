@@ -3,7 +3,8 @@ from sqlalchemy.orm import sessionmaker
 from basemodule import GetExposureData
 from configparser import ConfigParser
 from flask import jsonify
-from datetime import datetime
+from time import mktime
+from datetime import datetime, timedelta
 import sys
 
 parser = ConfigParser()
@@ -16,6 +17,8 @@ engine = create_engine(POSTGRES_ENGINE)
 Session = sessionmaker(bind=engine)
 
 class GetPm25ExposureData(GetExposureData):
+    # radius used to give some leeway to finding the specified lat lon
+    radius_meters = "2"
 
     # this might move up to parent class if it is generic for all
     def create_values_query(self, dt, pt, radius, stat_type, temp_res):
@@ -59,8 +62,6 @@ class GetPm25ExposureData(GetExposureData):
             return message
         date_list = GetExposureData.get_date_list(self, **kwargs)
 
-        # radius used to give some leeway to finding the specified lat lon
-        radius_meters = "2"
         # retrieve the temporal resolution and the statistical type
         tres = kwargs.get('temporal_resolution')
         stype = kwargs.get('statistical_type')
@@ -69,7 +70,7 @@ class GetPm25ExposureData(GetExposureData):
 
         for dt in date_list:
             for pt in point_list:
-                sql = self.create_values_query(dt, pt, radius_meters, stype, tres)
+                sql = self.create_values_query(dt, pt, self.radius_meters, stype, tres)
 
                 if tres == "hour":
                     result = session.execute(sql)
@@ -95,8 +96,12 @@ class GetPm25ExposureData(GetExposureData):
 
         return data
 
+    # supports 7dayrisk and 14dayrisk total scores
+    # applies to 7 or 14 days, previous to dates provided (including date provided)
+    # if a full set of data is not available for 7dayrisk - 7 rows returned,
+    # or 14dayrisk - 14 rows returned, "Not Available" will be returned
     def get_scores(self, **kwargs):
-        # {'kwargs': {'statistical_type': 'max', 'temporal_resolution': 'day', 'exposure_point': 'alkd',\
+        # {'kwargs': {'temporal_resolution': 'day', 'exposure_point': 'alkd', 'score_type': '7dayrisk',\
         #  'end_date': '2001-02-01', 'start_date': '2001-01-02', 'exposure_type': 'pm25'}}
         session = Session()
         (valid_points, message, point_list) = GetExposureData.validate_exposure_point(self, **kwargs)
@@ -104,36 +109,61 @@ class GetPm25ExposureData(GetExposureData):
             return message
         date_list = GetExposureData.get_date_list(self, **kwargs)
         sql_array = []
+
         for dt in date_list:
             for pt in point_list:
-                sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) from cmaq " \
-                      "where cast(utc_date_time as date) = cast('" + \
-                      dt[0] + "' as date) and latitude = " + pt[0] + " and longitude = " + pt[1] + ";"
-                result = session.execute(sql).scalar()
-                # 1: 24h max PM2.5 < 4.0 μg/m3
-                # 2: 24h max PM2.5 4.0-7.06 μg/m3
-                # 3: 24h max PM2.5 7.007-8.97 μg/m3
-                # 4: 24h max PM 2.5 8.98-11.36 μg/m3
-                # 5: 24h max PM2.5 > 11.37 μg/m3
-                if not result:
-                    result = 'Not Available'
-                elif result < 4.0:
-                    result = 1
-                elif 4.0 <= result < 7.06:
-                    result = 2
-                elif 7.06 <= result < 8.97:
-                    result = 3
-                elif 8.97 <= result < 11.36:
-                    result = 4
-                elif result >= 11.36:
-                    result = 5
 
+                # set date range for 7 or 14 day risk
+                score_type = kwargs.get('score_type')
+                date_range = int(score_type[:len(score_type) - len("dayrisk")])
+
+                d = datetime.strptime(dt[0], '%Y-%m-%d') - timedelta(days=date_range-1)  # change this to 6 or 13
+                end_date = datetime.strptime(dt[0], '%Y-%m-%d')
+                delta = timedelta(days=1)
+                scores = 0
+
+
+                while d <= end_date:
+                    d_as_str = d.strftime("%Y-%m-%d")
+
+                    sql = "select max(coalesce(pm25_primary,0) + coalesce(pm25_secondary,0)) from cmaq " \
+                            "where cast(utc_date_time as date) = cast('" + d_as_str + "' as date) " \
+                            "and ST_DWithin(ST_GeographyFromText('POINT(" + pt[1] + " " + pt[0] + ")'), location, 2)"
+
+                    result = session.execute(sql).scalar()
+
+                    # 1: 24h max PM2.5 < 4.0 μg/m3
+                    # 2: 24h max PM2.5 4.0-7.06 μg/m3
+                    # 3: 24h max PM2.5 7.007-8.97 μg/m3
+                    # 4: 24h max PM 2.5 8.98-11.36 μg/m3
+                    # 5: 24h max PM2.5 > 11.37 μg/m3
+                    if not result:
+                        # result = 'Not Available'
+                        return 'Not Available', 400, {'x-error': 'Score data not available for specified date range'}
+                    elif result < 4.0:
+                        result = 1
+                    elif 4.0 <= result < 7.06:
+                        result = 2
+                    elif 7.06 <= result < 8.97:
+                        result = 3
+                    elif 8.97 <= result < 11.36:
+                        result = 4
+                    elif result >= 11.36:
+                        result = 5
+
+                    scores += result
+
+                    # iterate to next day
+                    d += delta
+
+                risk = scores / date_range
                 sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
-                                  datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
-                                  pt[0], pt[1], str(result)])
+                                    datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
+                                    pt[0], pt[1], str(risk)])
+
         session.close()
         data = jsonify([{'end_time': o[1], 'exposure_type': 'pm25', 'latitude': o[2], 'longitude': o[3],
-                         'start_time': o[0], 'units': kwargs.get('score_type'), 'value': o[4]
+                         'start_time': o[0], 'units': score_type, 'value': o[4]
                          } for o in sql_array])
 
         return data
@@ -176,7 +206,7 @@ def get_values(**kwargs):
 
 
 def get_scores(**kwargs):
-    print(kwargs)
+    # print(kwargs)
     date_args = {'date_table': 'cmaq', 'date_column': 'utc_date_time', 'start_date': kwargs.get('start_date'),
             'end_date': kwargs.get('end_date')}
     (valid_date, message) = exp.validate_date_range(**date_args)
