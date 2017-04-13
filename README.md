@@ -330,40 +330,39 @@ These directories will remain in place with whatever data has been populated to 
 
 ## Local Docker Deploy
 
-The script named `local-docker-deploy` will attemp to deploy both the backend [PostgreSQL database](https://github.com/mjstealey/datatranslator/tree/develop/backend) (populated with sample data) using the [dbctl](https://github.com/mjstealey/datatranslator/blob/develop/dbctl) script, and the python flask server using the [run-in-docker](https://github.com/mjstealey/datatranslator/blob/develop/run-in-docker) script on the local system in Docker.
+The script named `local-docker-deploy` will attempt to deploy both the backend [PostgreSQL database](https://github.com/mjstealey/datatranslator/tree/develop/backend) (populated with sample data) using the [dbctl](https://github.com/mjstealey/datatranslator/blob/develop/dbctl) script, and the python flask server using the [run-in-docker](https://github.com/mjstealey/datatranslator/blob/develop/run-in-docker) script on the local system in Docker.
 
-At this time there are two files that control the configuration of the final deploy.
+The **api-server** will default to the settings as defined by it's environment variables.
 
+default configuration:
 
-1. **python-flask-server/ini/connexion-template.ini** - configParser ini file (see # commented notes)
+```
+# Set default environment variables
+# [connexion/api-server]
+ENV CONNEXION_SERVER=
+ENV CONNEXION_DEBUG=True
+ENV API_SERVER_HOST=localhost
+ENV API_SERVER_PORT=5000
+ENV API_SERVER_KEYFILE=
+ENV API_SERVER_CERTFILE=
+# [sys-path]
+ENV SYS_PATH_EXPOSURES=/exposures-api/exposures
+# [postgres]
+ENV POSTGRES_HOST=backend
+ENV POSTGRES_PORT=5432
+ENV POSTGRES_DATABASE=bdtgreen
+ENV POSTGRES_USERNAME=datatrans
+ENV POSTGRES_PASSWORD=somepassword
+ENV POSTGRES_IP=
+```
 
-
-	```
-	; template ini file for running the development server
-	; in docker with debug mode on
-	[connexion]
-	server =			# defines server type, blank = development
-	debug = True		# whether debug is enabled
-	port = 8080		
-	
-	[sys-path]
-	exposures = /datatranslator/exposures
-	
-	[postgres]
-	host = backend
-	port = 5432
-	database = bdtgreen
-	username = datatrans
-	password = somepassword
-	```
-
-2. **python-flask-server/run-in-docker** - bash script to launch api-server (see # commented notes)
+The port and FQDN or IP can be changed by updating the values found in the **python-flask-server/run-in-docker** bash script. (see # commented notes)
 
 	```
 	#!/usr/bin/env bash
 	
 	API_SERVER_HOST=localhost	# FQDN or IP of service exposure to the outside
-	API_SERVER_PORT=8080		# Port of service exposure to the outside
+	API_SERVER_PORT=5000		# Port of service exposure to the outside
 	...
 	```
 
@@ -413,6 +412,6 @@ Successfully built af8cfebcc17d
 0f7e835e2c084913d5a4fc47e25e1a06553497bbd2958f5bb3dc38230563cc4d
 ```
 
-Based on the above sample configuration the API web service would be available on the local machine at [http://localhost:8080/v1/ui/](http://localhost:8080/v1/ui/#/)
+Based on the above sample configuration the API web service would be available on the local machine at [http://localhost:5000/v1/ui/](http://localhost:5000/v1/ui/#/)
 
 **NOTE**: By default the script will stop and purge the backend datbase container, then rebuild it using the sample data scripts in the repository. This can become promblematic if the user has chosen to preserve the database contents locally as it will then generate duplicates of prior data due to the current behavior of the loading script.
