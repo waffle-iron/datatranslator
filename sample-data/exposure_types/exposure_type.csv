@@ -1,3 +1,0 @@
-exposure_type,description,units,has_values,has_score,schema_version
-pm25,particulate matter 2.5,ugm3,true,true,1.0.0
-o3,ozone,ppm,true,true,1.0.0
