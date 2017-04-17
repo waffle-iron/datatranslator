@@ -138,8 +138,8 @@ class GetO3ExposureData(GetExposureData):
                     # 5: 24h max ozone > 0.125 ppm
 
                     if not result:
-                        # result = 'Not Available'
-                        return 'Not Available', 400, {'x-error': 'Score data not available for specified date range'}
+                        scores = 'Not Available'
+                        break
                     elif result <= 0.050:
                         result = 1
                     elif 0.050 < result <= 0.075:
@@ -156,7 +156,10 @@ class GetO3ExposureData(GetExposureData):
                     # iterate to next day
                     d += delta
 
-                risk = scores / date_range
+                if scores == 'Not Available':
+                    risk = scores
+                else:
+                    risk = scores / date_range
                 sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
                                     datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
                                     pt[0], pt[1], str(risk)])

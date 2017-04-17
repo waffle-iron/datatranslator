@@ -137,8 +137,8 @@ class GetPm25ExposureData(GetExposureData):
                     # 4: 24h max PM 2.5 8.98-11.36 μg/m3
                     # 5: 24h max PM2.5 > 11.37 μg/m3
                     if not result:
-                        # result = 'Not Available'
-                        return 'Not Available', 400, {'x-error': 'Score data not available for specified date range'}
+                        scores = 'Not Available'
+                        break
                     elif result < 4.0:
                         result = 1
                     elif 4.0 <= result < 7.06:
@@ -154,8 +154,10 @@ class GetPm25ExposureData(GetExposureData):
 
                     # iterate to next day
                     d += delta
-
-                risk = scores / date_range
+                if scores == 'Not Available':
+                    risk = scores
+                else:
+                    risk = scores / date_range
                 sql_array.append([datetime.strptime(dt[0] + ' 00:00:00', '%Y-%m-%d %H:%M:%S'),
                                     datetime.strptime(dt[0] + ' 23:00:00', '%Y-%m-%d %H:%M:%S'),
                                     pt[0], pt[1], str(risk)])
