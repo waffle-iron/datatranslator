@@ -3,7 +3,6 @@ from sqlalchemy.orm import sessionmaker
 from basemodule import GetExposureData
 from configparser import ConfigParser
 from flask import jsonify
-from time import mktime
 from datetime import datetime, timedelta
 import sys
 
