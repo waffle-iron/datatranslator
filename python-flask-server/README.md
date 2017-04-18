@@ -1,6 +1,80 @@
-# Swagger generated server
+# Swagger generated api server (python-flask)
 
-## Setup
+## Docker
+
+The Environmental Exposures API is available in docker as [mjstealey/exposures_api](https://hub.docker.com/r/mjstealey/exposures_api/). There is an assumption that it will be used to connect to a PostgreSQL/PostGIS database pre-populated with the appropriate environmental exposures data tables.
+
+Usage examples will be given in the context of the sample database included in this repository.
+
+Example:
+
+```
+$ docker pull mjstealey/exposures_api
+$ docker run -d \
+	--name api-server \
+	-e POSTGRES_HOST=backend.postgres.server \
+	-e POSTGRES_PORT=5432 \
+	-e POSTGRES_DATABASE=bdtgreen \
+	-e POSTGRES_USERNAME=datatrans \
+	-e POSTGRES_PASSWORD=somepassword \
+	-p 5000:5000 \
+	mjstealey/exposures_api
+```
+
+Once completed the exposures_api would be running at [http://localhost:5000/v1/ui/#/](http://localhost:5000/v1/ui/#/)
+
+The **exposure_api** uses environment variables to set itself up, and these can be passed in either individually, or by use of an environment file.
+
+Example environment file (exposures-api.env) with default values
+
+```
+CONNEXION_SERVER=
+CONNEXION_DEBUG=True
+API_SERVER_HOST=localhost
+API_SERVER_PORT=5000
+API_SERVER_KEYFILE=
+API_SERVER_CERTFILE=
+POSTGRES_HOST=backend
+POSTGRES_PORT=5432
+POSTGRES_DATABASE=bdtgreen
+POSTGRES_USERNAME=datatrans
+POSTGRES_PASSWORD=somepassword
+POSTGRES_IP=
+```
+
+The user can define the `CONNEXION_SERVER` to be **blank**, **gevent**, or **tornado**. In our case we'll use **gevent**.
+
+The user can also deploy using SSL certificates, as would likely be found in a prodution deployment.
+
+Example (exposures-api.env):
+
+```
+CONNEXION_SERVER=gevent
+CONNEXION_DEBUG=False
+API_SERVER_HOST=my.api-server.org
+API_SERVER_PORT=443
+API_SERVER_KEYFILE=/certs/server.key
+API_SERVER_CERTFILE=/certs/server.crt
+POSTGRES_HOST=backend.postgres.server
+POSTGRES_PORT=5432
+POSTGRES_DATABASE=bdtgreen
+POSTGRES_USERNAME=datatrans
+POSTGRES_PASSWORD=somepassword
+POSTGRES_IP=
+```
+
+```
+$ docker run -d \
+	--name api-server \
+	--env-file=exposures-api.env \
+	-v /home/docker/certs:/certs  \
+	-p 443:443 \
+	mjstealey/exposures_api
+```
+
+Once completed the exposures_api would be running at [https://my.api-server.org/v1/ui/#/](https://my.api-server.org/v1/ui/#/)
+
+## Setup for local development
 Development is being done in virtualenv using python 3
 
 ```
@@ -49,3 +123,37 @@ Your Swagger definition lives here:
 http://localhost:8080/mjstealey/environmental/v1/swagger.json
 ```
 
+## Run locally and develop in Docker
+
+A script named **run-in-docker** is provided to run the API web server in a Docker container. 
+
+At this time the default configuration of the exposures_api docker image is configured to use the development datbase in this repository. This is most easily invoked by using the [local-docker-deploy](https://github.com/mjstealey/datatranslator/blob/develop/local-docker-deploy) script at the top level of the repository.
+
+Alternately the user can choose to alter the settings in the **run-in-docker** script to suite their local deployemnt.
+
+```bash
+#!/usr/bin/env bash
+
+API_SERVER_HOST=localhost	# FQDN or IP of service exposure to the outside
+API_SERVER_PORT=5000		# Port of service exposure to the outside
+...
+```
+
+Example:
+
+```
+$ ./run-in-docker --build
+api-server
+api-server
+Untagged: api-server:latest
+Deleted: sha256:af8cfebcc17d3055c09bfc3dc01e57ccd53bd5207f5ea3948432cfe3d9f08ec2
+...
+Step 8/8 : CMD api
+ ---> Running in 3b611e40bb93
+ ---> 17b057e8735d
+Removing intermediate container 3b611e40bb93
+Successfully built 17b057e8735d
+fe7cff542cdbed39e95d88392603e74b2dc79a1aa60a6d6b925761cbbb62900c
+```
+
+Based on the above sample configuration the API web service would be available on the local machine at [http://localhost:5000/v1/ui/](http://localhost:5000/v1/ui/#/)

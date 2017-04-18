@@ -38,7 +38,7 @@ INSERT INTO cmaq (city_name, latitude, longitude, location, utc_date_time, ozone
       ID,
       cast(lat as FLOAT),
       cast(lon as FLOAT),
-      ST_GeographyFromText('SRID=4326;POINT('||lat||' '||lon||')'),
+      ST_GeographyFromText('SRID=4326;POINT('||lon||' '||lat||')'),
       cast(date as TIMESTAMP),
       cast(o3_ppb as FLOAT),
       cast(pm25_primary_ugm3 as FLOAT) * 0.10,
