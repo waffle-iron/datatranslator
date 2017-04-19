@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/mjstealey/datatranslator.png?label=ready&title=Ready)](https://waffle.io/mjstealey/datatranslator)
 # Environmental Exposures API
 
 ### TL;DR
